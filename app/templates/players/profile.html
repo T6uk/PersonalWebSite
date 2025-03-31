@@ -1,147 +1,188 @@
 {% extends "base.html" %}
 
-{% block title %}Profile - Football Team Management{% endblock %}
+{% block title %}Profile - FC Mara{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        <div class="card">
+        <div class="card border-0 shadow">
             <div class="card-header bg-primary text-white">
-                <h4 class="card-title mb-0">Your Profile</h4>
+                <h4 class="card-title mb-0"><i class="fas fa-user-edit me-2"></i>Your Profile</h4>
             </div>
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_picture) }}"
-                         alt="{{ current_user.username }}"
-                         class="profile-img">
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-md-4 mb-4 mb-md-0">
+                        <div class="text-center">
+                            <div class="position-relative mb-4 mx-auto" style="width: fit-content;">
+                                <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_picture) }}"
+                                     alt="{{ current_user.username }}"
+                                     class="profile-img">
+                                <div class="position-absolute bottom-0 end-0">
+                                    <label for="profile_picture" class="btn btn-sm btn-primary rounded-circle" style="width: 36px; height: 36px;" data-bs-toggle="tooltip" title="Change profile picture">
+                                        <i class="fas fa-camera"></i>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <h5 class="mb-1 fw-bold">{{ current_user.first_name }} {{ current_user.last_name }}</h5>
+                            <p class="text-muted mb-0">{{ current_user.email }}</p>
+                            <p class="badge bg-primary mt-2">Player</p>
+
+                            <div class="mt-3">
+                                <p class="mb-1"><i class="fas fa-id-badge me-2 text-primary"></i>{{ current_user.username }}</p>
+                                <p class="mb-0"><i class="fas fa-calendar-alt me-2 text-primary"></i>Joined {{ current_user.date_joined.strftime('%b %d, %Y') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <form method="POST" action="" enctype="multipart/form-data">
+                            {{ form.hidden_tag() }}
+
+                            <!-- Hide the file input and use the label as a trigger -->
+                            {{ form.profile_picture(class="d-none", id="profile_picture") }}
+
+                            <h5 class="border-bottom pb-2 mb-4"><i class="fas fa-info-circle me-2"></i>Personal Information</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ form.first_name.label(class="form-label") }}
+                                    {% if form.first_name.errors %}
+                                        {{ form.first_name(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.first_name.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.first_name(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.last_name.label(class="form-label") }}
+                                    {% if form.last_name.errors %}
+                                        {{ form.last_name(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.last_name.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.last_name(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ form.username.label(class="form-label") }}
+                                    {% if form.username.errors %}
+                                        {{ form.username(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.username.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.username(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.email.label(class="form-label") }}
+                                    {% if form.email.errors %}
+                                        {{ form.email(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.email.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.email(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <h5 class="border-bottom pb-2 mb-4 mt-5"><i class="fas fa-lock me-2"></i>Security</h5>
+                            <div class="mb-3">
+                                {{ form.current_password.label(class="form-label") }}
+                                {% if form.current_password.errors %}
+                                    {{ form.current_password(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.current_password.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.current_password(class="form-control") }}
+                                {% endif %}
+                                <div class="form-text">Enter your current password to change password</div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ form.new_password.label(class="form-label") }}
+                                    {% if form.new_password.errors %}
+                                        {{ form.new_password(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.new_password.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.new_password(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.confirm_password.label(class="form-label") }}
+                                    {% if form.confirm_password.errors %}
+                                        {{ form.confirm_password(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.confirm_password.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.confirm_password(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="d-grid mt-4">
+                                {{ form.submit(class="btn btn-primary btn-lg") }}
+                            </div>
+                        </form>
+                    </div>
                 </div>
-
-                <form method="POST" action="" enctype="multipart/form-data">
-                    {{ form.hidden_tag() }}
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.first_name.label(class="form-label") }}
-                            {% if form.first_name.errors %}
-                                {{ form.first_name(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.first_name.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.first_name(class="form-control") }}
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form.last_name.label(class="form-label") }}
-                            {% if form.last_name.errors %}
-                                {{ form.last_name(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.last_name.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.last_name(class="form-control") }}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.username.label(class="form-label") }}
-                            {% if form.username.errors %}
-                                {{ form.username(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.username.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.username(class="form-control") }}
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form.email.label(class="form-label") }}
-                            {% if form.email.errors %}
-                                {{ form.email(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.email.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.email(class="form-control") }}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.profile_picture.label(class="form-label") }}
-                        {{ form.profile_picture(class="form-control") }}
-                        {% if form.profile_picture.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.profile_picture.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <small class="form-text text-muted">Leave empty to keep current profile picture.</small>
-                    </div>
-
-                    <hr>
-                    <h5>Change Password (Optional)</h5>
-
-                    <div class="mb-3">
-                        {{ form.current_password.label(class="form-label") }}
-                        {% if form.current_password.errors %}
-                            {{ form.current_password(class="form-control is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.current_password.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.current_password(class="form-control") }}
-                        {% endif %}
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.new_password.label(class="form-label") }}
-                            {% if form.new_password.errors %}
-                                {{ form.new_password(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.new_password.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.new_password(class="form-control") }}
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form.confirm_password.label(class="form-label") }}
-                            {% if form.confirm_password.errors %}
-                                {{ form.confirm_password(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.confirm_password.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.confirm_password(class="form-control") }}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="d-grid">
-                        {{ form.submit(class="btn btn-primary") }}
-                    </div>
-                </form>
             </div>
+        </div>
+
+        <div class="d-flex justify-content-center mt-4">
+            <a href="{{ url_for('players.dashboard') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Show file name when selected
+        document.getElementById('profile_picture').addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.querySelector('.profile-img').src = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+</script>
 {% endblock %}

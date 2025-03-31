@@ -1,25 +1,45 @@
 {% extends "base.html" %}
 
-{% block title %}Player Dashboard - Football Team Management{% endblock %}
+{% block title %}Player Dashboard - FC Mara{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-lg-4 mb-4">
-        <div class="card">
-            <div class="card-body text-center">
-                <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_picture) }}" alt="{{ current_user.username }}" class="profile-img mb-3">
-                <h4>{{ current_user.first_name }} {{ current_user.last_name }}</h4>
-                <p class="text-muted">{{ current_user.email }}</p>
-                <p class="text-muted">Player since {{ current_user.date_joined.strftime('%d %b %Y') }}</p>
-                <a href="{{ url_for('players.profile') }}" class="btn btn-primary">Edit Profile</a>
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-user me-2"></i>Your Profile</h5>
+            </div>
+            <div class="card-body text-center p-4">
+                <div class="position-relative mb-4">
+                    <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_picture) }}"
+                         alt="{{ current_user.username }}"
+                         class="profile-img mb-3">
+                    <div class="badge bg-success position-absolute bottom-0 end-0 p-2">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold mb-1">{{ current_user.first_name }} {{ current_user.last_name }}</h4>
+                <p class="text-muted mb-2">{{ current_user.email }}</p>
+                <div class="d-flex justify-content-center align-items-center mb-3">
+                    <span class="badge bg-primary me-2 px-3 py-2">Player</span>
+                    <span class="text-muted small">
+                        <i class="fas fa-calendar-alt me-1"></i> Joined {{ current_user.date_joined.strftime('%d %b %Y') }}
+                    </span>
+                </div>
+                <a href="{{ url_for('players.profile') }}" class="btn btn-primary">
+                    <i class="fas fa-user-edit me-2"></i>Edit Profile
+                </a>
             </div>
         </div>
     </div>
 
     <div class="col-lg-8">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Your Statistics</h5>
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-line me-2"></i>Your Statistics</h5>
+                <a href="{{ url_for('statistics.player_detail', player_id=current_user.id) }}" class="btn btn-sm btn-light">
+                    <i class="fas fa-external-link-alt me-1"></i>View Details
+                </a>
             </div>
             <div class="card-body">
                 {% if stats %}
@@ -37,7 +57,7 @@
                             <tbody>
                                 {% for stat in stats %}
                                     <tr>
-                                        <td>{{ stat.season }}</td>
+                                        <td class="fw-medium">{{ stat.season }}</td>
                                         <td class="text-center">{{ stat.appearances }}</td>
                                         <td class="text-center">{{ stat.goals }}</td>
                                         <td class="text-center">{{ stat.assists }}</td>
@@ -48,42 +68,99 @@
                         </table>
                     </div>
                 {% else %}
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>No statistics available for you yet.
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-area text-muted fa-3x mb-3"></i>
+                        <p class="text-muted">No statistics available for you yet.</p>
                     </div>
                 {% endif %}
             </div>
         </div>
 
-        <div class="card">
+        <div class="card border-0 shadow-sm">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Upcoming Events</h5>
+                <h5 class="card-title mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Events</h5>
             </div>
             <div class="card-body">
                 {% set upcoming_events = get_upcoming_events(5) %}
                 {% if upcoming_events %}
                     <div class="list-group">
                         {% for event in upcoming_events %}
-                            <a href="{{ url_for('events.detail', event_id=event.id) }}" class="list-group-item list-group-item-action">
+                            <a href="{{ url_for('events.detail', event_id=event.id) }}" class="list-group-item list-group-item-action event-card">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h5 class="mb-1">{{ event.title }}</h5>
-                                        <p class="mb-1">
-                                            <i class="fas fa-map-marker-alt me-1"></i>{{ event.location or 'Location TBD' }}
-                                            {% if event.opponent %}| <i class="fas fa-user-friends me-1"></i>{{ event.opponent }}{% endif %}
+                                        <h6 class="mb-1 fw-bold">{{ event.title }}</h6>
+                                        <p class="mb-1 small">
+                                            <i class="fas fa-map-marker-alt me-1 text-primary"></i>{{ event.location or 'Location TBD' }}
+                                            {% if event.opponent %}
+                                                <span class="ms-3">
+                                                    <i class="fas fa-user-friends me-1 text-secondary"></i>{{ event.opponent }}
+                                                </span>
+                                            {% endif %}
                                         </p>
-                                        <small class="text-muted">{{ event.event_date.strftime('%d %b %Y, %H:%M') }}</small>
+                                        <small class="text-muted">
+                                            <i class="far fa-calendar me-1"></i>{{ event.event_date.strftime('%d %b %Y') }}
+                                            <i class="far fa-clock ms-2 me-1"></i>{{ event.event_date.strftime('%H:%M') }}
+                                        </small>
                                     </div>
                                     <span class="badge bg-primary rounded-pill">{{ event.event_type.name }}</span>
                                 </div>
                             </a>
                         {% endfor %}
                     </div>
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('events.index') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-calendar-alt me-1"></i>View All Events
+                        </a>
+                    </div>
                 {% else %}
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>No upcoming events scheduled.
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times text-muted fa-3x mb-3"></i>
+                        <p class="text-muted">No upcoming events scheduled.</p>
                     </div>
                 {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-bullhorn me-2"></i>Team Announcements</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="p-4 bg-light text-center">
+                    <i class="fas fa-megaphone fa-3x text-primary mb-3"></i>
+                    <h5 class="fw-bold">Team Meeting Reminder!</h5>
+                    <p class="mb-0">Our next team meeting is scheduled for Friday at 3:00 PM in the conference room.</p>
+                </div>
+                <div class="p-4 border-top">
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary text-white rounded-circle p-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="fw-bold">Training Schedule Updated</h5>
+                            <p class="text-muted">The training schedule for next week has been updated. Please check your email for details.</p>
+                            <p class="small text-muted mb-0"><i class="far fa-clock me-1"></i>March 29, 2025</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success text-white rounded-circle p-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="fw-bold">Congratulations on the Win!</h5>
+                            <p class="text-muted">Great job on Saturday's match! The coach has some feedback to share during the next practice.</p>
+                            <p class="small text-muted mb-0"><i class="far fa-clock me-1"></i>March 25, 2025</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

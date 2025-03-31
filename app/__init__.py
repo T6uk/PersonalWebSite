@@ -92,7 +92,7 @@ def create_admin_user():
         last_name='User',
         user_type='admin'
     )
-    admin.set_password('admin123')  # This should be changed immediately
+    admin.set_password('1234')  # This should be changed immediately
 
     db.session.add(admin)
     db.session.commit()
