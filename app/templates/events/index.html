@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Events - Football Team Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Team Events</h1>
+    {% if current_user.is_authenticated and current_user.is_admin() %}
+    <div>
+        <a href="{{ url_for('events.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Add Event
+        </a>
+        <a href="{{ url_for('events.event_types') }}" class="btn btn-outline-primary ms-2">
+            <i class="fas fa-tags me-1"></i>Event Types
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <ul class="nav nav-tabs mb-4" id="eventTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">Upcoming</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab" aria-controls="past" aria-selected="false">Past</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="eventTabsContent">
+            <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+                {% set upcoming_events = events.items|selectattr('event_date', 'gt', now()) %}
+                {% if upcoming_events|list|length > 0 %}
+                    <div class="list-group">
+                        {% for event in upcoming_events %}
+                            <a href="{{ url_for('events.detail', event_id=event.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ event.title }}</h5>
+                                        <p class="mb-1">
+                                            <i class="fas fa-map-marker-alt me-1"></i>{{ event.location or 'Location TBD' }}
+                                            {% if event.opponent %}| <i class="fas fa-user-friends me-1"></i>{{ event.opponent }}{% endif %}
+                                        </p>
+                                        <small class="text-muted">{{ event.event_date.strftime('%d %b %Y, %H:%M') }}</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ event.event_type.name }}</span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No upcoming events scheduled.
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+                {% set past_events = events.items|selectattr('event_date', 'le', now()) %}
+                {% if past_events|list|length > 0 %}
+                    <div class="list-group">
+                        {% for event in past_events %}
+                            <a href="{{ url_for('events.detail', event_id=event.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ event.title }}</h5>
+                                        <p class="mb-1">
+                                            {% if event.result %}
+                                                <span class="badge {{ event.result == 'Win' and 'bg-success' or event.result == 'Loss' and 'bg-danger' or 'bg-secondary' }} me-2">{{ event.result }}</span>
+                                            {% endif %}
+                                            {% if event.score %}{{ event.score }}{% endif %}
+                                        </p>
+                                        <small class="text-muted">{{ event.event_date.strftime('%d %b %Y, %H:%M') }}</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ event.event_type.name }}</span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No past events found.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% for page_num in events.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        {% if page_num == events.page %}
+                            <li class="page-item active">
+                                <a class="page-link" href="#">{{ page_num }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('events.index', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
