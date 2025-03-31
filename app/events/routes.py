@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
-from app.events.forms import EventTypeForm, EventForm
+from app.events import EventTypeForm, EventForm
 from app.models.event import Event, EventType
 from app.extensions import db
 from app.utils.decorators import admin_required

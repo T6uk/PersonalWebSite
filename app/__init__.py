@@ -1,46 +1,18 @@
+# app/__init__.py
 from flask import Flask
-from app.config import Config
+from config import Config
 from app.extensions import db, migrate, login_manager, bcrypt, mail
 import os
 import logging
 from logging.handlers import RotatingFileHandler
 from flask.cli import with_appcontext
 import click
+from app import filters
+from app.context_processors import utility_processor
 
 
 def create_app(config_class=Config):
     app = Flask(__name__)
-
-    filters.init_app(app)
-    app.context_processor(utility_processor)
-
-    # Create initial admin user
-    def create_admin_user():
-        """Create initial admin user if none exists."""
-        from app.models.user import User
-        from app.extensions import db
-
-        # Check if any admin exists
-        admin_exists = User.query.filter_by(user_type='admin').first()
-        if admin_exists:
-            return
-
-        # Create admin user
-        admin = User(
-            username='admin',
-            email='admin@example.com',
-            first_name='Admin',
-            last_name='User',
-            user_type='admin'
-        )
-        admin.set_password('1234')  # This should be changed immediately
-
-        db.session.add(admin)
-        db.session.commit()
-
-        print('Created admin user: admin@example.com / admin123')
-        print('Please change this password immediately after first login')
-
     app.config.from_object(config_class)
 
     # Initialize extensions
@@ -54,6 +26,10 @@ def create_app(config_class=Config):
     login_manager.login_view = 'auth.login'
     login_manager.login_message_category = 'info'
 
+    # Initialize filters and context processors
+    filters.init_app(app)
+    app.context_processor(utility_processor)
+
     # Ensure upload directory exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -64,7 +40,6 @@ def create_app(config_class=Config):
     from app.events.routes import events
     from app.statistics.routes import statistics
     from app.trophies.routes import trophies
-    from app import filters
     from app.errors import errors
 
     app.register_blueprint(auth, url_prefix='/auth')
@@ -82,18 +57,45 @@ def create_app(config_class=Config):
     def index():
         return render_template('index.html')
 
+    # Setup logging
+    if not app.debug:
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+        file_handler = RotatingFileHandler('logs/football_team_management.log', maxBytes=10240, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('Football Team Management startup')
+
     return app
 
 
-if not app.debug:
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
-    file_handler = RotatingFileHandler('logs/football_team_management.log', maxBytes=10240, backupCount=10)
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-    ))
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
+def create_admin_user():
+    """Create initial admin user if none exists."""
+    from app.models.user import User
+    from app.extensions import db
 
-    app.logger.setLevel(logging.INFO)
-    app.logger.info('Football Team Management startup')
+    # Check if any admin exists
+    admin_exists = User.query.filter_by(user_type='admin').first()
+    if admin_exists:
+        return
+
+    # Create admin user
+    admin = User(
+        username='admin',
+        email='admin@example.com',
+        first_name='Admin',
+        last_name='User',
+        user_type='admin'
+    )
+    admin.set_password('admin123')  # This should be changed immediately
+
+    db.session.add(admin)
+    db.session.commit()
+
+    print('Created admin user: admin@example.com / admin123')
+    print('Please change this password immediately after first login')

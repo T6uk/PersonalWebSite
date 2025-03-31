@@ -1,7 +1,9 @@
+# app/utils/email.py
 from flask import current_app, url_for
 from flask_mail import Message
 from app.extensions import mail
 from itsdangerous import URLSafeTimedSerializer
+from app.models.user import User
 
 def send_reset_email(user):
     token = generate_reset_token(user.email)
