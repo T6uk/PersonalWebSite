@@ -1,3 +1,4 @@
+<!-- app/templates/events/create.html (updated) -->
 {% extends "base.html" %}
 
 {% block title %}Create Event - FC Mara{% endblock %}
@@ -42,6 +43,22 @@
                             {% endif %}
                         </div>
                         <div class="col-md-6">
+                            {{ form.tournament.label(class="form-label") }}
+                            {% if form.tournament.errors %}
+                                {{ form.tournament(class="form-select is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.tournament.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.tournament(class="form-select") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
                             {{ form.event_date.label(class="form-label") }}
                             {% if form.event_date.errors %}
                                 <input type="datetime-local" name="event_date" id="event_date" class="form-control is-invalid" required>
@@ -54,22 +71,6 @@
                                 <input type="datetime-local" name="event_date" id="event_date" class="form-control" required>
                             {% endif %}
                             <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM</small>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.opponent.label(class="form-label") }}
-                            {% if form.opponent.errors %}
-                                {{ form.opponent(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.opponent.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.opponent(class="form-control") }}
-                            {% endif %}
                         </div>
                         <div class="col-md-6">
                             {{ form.location.label(class="form-label") }}
@@ -87,6 +88,20 @@
                     </div>
 
                     <div class="mb-3">
+                        {{ form.opponent.label(class="form-label") }}
+                        {% if form.opponent.errors %}
+                            {{ form.opponent(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.opponent.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.opponent(class="form-control") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
                         {{ form.description.label(class="form-label") }}
                         {% if form.description.errors %}
                             {{ form.description(class="form-control is-invalid", rows=5) }}
@@ -100,32 +115,53 @@
                         {% endif %}
                     </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.result.label(class="form-label") }}
-                            {% if form.result.errors %}
-                                {{ form.result(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.result.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.result(class="form-control") }}
-                            {% endif %}
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Result (Complete after the event)</h5>
                         </div>
-                        <div class="col-md-6">
-                            {{ form.score.label(class="form-label") }}
-                            {% if form.score.errors %}
-                                {{ form.score(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.score.errors %}
-                                        {{ error }}
-                                    {% endfor %}
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    {{ form.result.label(class="form-label") }}
+                                    {% if form.result.errors %}
+                                        {{ form.result(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.result.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.result(class="form-control") }}
+                                    {% endif %}
+                                    <small class="form-text text-muted">E.g., Win, Loss, Draw</small>
                                 </div>
-                            {% else %}
-                                {{ form.score(class="form-control") }}
-                            {% endif %}
+                                <div class="col-md-4 mb-3">
+                                    {{ form.team_score.label(class="form-label") }}
+                                    {% if form.team_score.errors %}
+                                        {{ form.team_score(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.team_score.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.team_score(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    {{ form.opponent_score.label(class="form-label") }}
+                                    {% if form.opponent_score.errors %}
+                                        {{ form.opponent_score(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.opponent_score.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.opponent_score(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
 

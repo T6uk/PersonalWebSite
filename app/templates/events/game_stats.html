@@ -1,0 +1,308 @@
+<!-- app/templates/events/game_stats.html -->
+{% extends "base.html" %}
+
+{% block title %}Game Statistics: {{ event.title }} - FC Mara{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>
+            <i class="fas fa-chart-bar me-2 text-primary"></i>Game Statistics
+        </h1>
+        <p class="lead mb-0">
+            <a href="{{ url_for('events.detail', event_id=event.id) }}" class="text-decoration-none">
+                {{ event.title }}
+            </a>
+            <span class="text-muted">{{ event.event_date.strftime('%d %b %Y, %H:%M') }}</span>
+        </p>
+    </div>
+    {% if current_user.is_authenticated and current_user.is_admin() %}
+    <div>
+        <a href="{{ url_for('events.add_game_stat', event_id=event.id) }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Add Player Stats
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0 d-flex align-items-center">
+            <i class="fas fa-info-circle me-2"></i>Match Information
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center mb-3 mb-md-0">
+                <h5>FC Mara</h5>
+                {% if event.result %}
+                    <div class="display-4 fw-bold">{{ event.team_score }}</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 text-center">
+                <h5>{{ event.opponent or 'Opponent' }}</h5>
+                {% if event.result %}
+                    <div class="display-4 fw-bold">{{ event.opponent_score }}</div>
+                {% endif %}
+            </div>
+        </div>
+        {% if event.result %}
+            <div class="text-center mt-3">
+                <span class="badge {{ event.result == 'Win' and 'bg-success' or event.result == 'Loss' and 'bg-danger' or 'bg-secondary' }} fs-5 px-4 py-2">
+                    {{ event.result }}
+                </span>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if game_stats %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0 d-flex align-items-center">
+                <i class="fas fa-users me-2"></i>Player Statistics
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Player</th>
+                            <th class="text-center">Minutes</th>
+                            <th class="text-center">Goals</th>
+                            <th class="text-center">Assists</th>
+                            <th class="text-center">Cards</th>
+                            <th class="text-center">Shots</th>
+                            <th class="text-center">Pass Accuracy</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in game_stats %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ url_for('static', filename='uploads/profiles/' + stat.player.profile_picture) }}"
+                                            alt="{{ stat.player.first_name }}"
+                                            class="rounded-circle me-2"
+                                            width="40" height="40">
+                                        <div>
+                                            {{ stat.player.first_name }} {{ stat.player.last_name }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">{{ stat.minutes_played }}</td>
+                                <td class="text-center">{{ stat.goals }}</td>
+                                <td class="text-center">{{ stat.assists }}</td>
+                                <td class="text-center">
+                                    {% if stat.yellow_cards > 0 %}
+                                        <span class="badge bg-warning text-dark">{{ stat.yellow_cards }}</span>
+                                    {% endif %}
+                                    {% if stat.red_cards > 0 %}
+                                        <span class="badge bg-danger ms-1">{{ stat.red_cards }}</span>
+                                    {% endif %}
+                                    {% if stat.yellow_cards == 0 and stat.red_cards == 0 %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ stat.shots }} ({{ stat.shots_on_target }} on target)</td>
+                                <td class="text-center">{{ stat.pass_accuracy }}%</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#statsModal{{ stat.id }}">
+                                        <i class="fas fa-list-ul"></i>
+                                    </button>
+                                    {% if current_user.is_authenticated and current_user.is_admin() %}
+                                        <div class="btn-group ms-1">
+                                            <a href="{{ url_for('events.update_game_stat', event_id=event.id, stat_id=stat.id) }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ url_for('events.delete_game_stat', event_id=event.id, stat_id=stat.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete these statistics?')">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- Stats Modal -->
+                            <div class="modal fade" id="statsModal{{ stat.id }}" tabindex="-1" aria-labelledby="statsModalLabel{{ stat.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-primary text-white">
+                                            <h5 class="modal-title" id="statsModalLabel{{ stat.id }}">
+                                                {{ stat.player.first_name }} {{ stat.player.last_name }} - Detailed Statistics
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row text-center">
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card bg-light">
+                                                        <div class="card-body">
+                                                            <h2 class="mb-0 fw-bold">{{ stat.minutes_played }}</h2>
+                                                            <p class="text-muted mb-0">Minutes Played</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card bg-light">
+                                                        <div class="card-body">
+                                                            <h2 class="mb-0 fw-bold">{{ stat.goals }}</h2>
+                                                            <p class="text-muted mb-0">Goals</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card bg-light">
+                                                        <div class="card-body">
+                                                            <h2 class="mb-0 fw-bold">{{ stat.assists }}</h2>
+                                                            <p class="text-muted mb-0">Assists</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h6 class="mt-4 mb-3 border-bottom pb-2">Shooting</h6>
+                                            <div class="row">
+                                                <div class="col-6 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Total Shots:</span>
+                                                        <strong>{{ stat.shots }}</strong>
+                                                </div>
+                                                <div class="col-6 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Shots on Target:</span>
+                                                        <strong>{{ stat.shots_on_target }}</strong>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Accuracy:</span>
+                                                        <strong>{{ (stat.shots > 0) and ((stat.shots_on_target / stat.shots) * 100)|round|int or 0 }}%</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h6 class="mt-4 mb-3 border-bottom pb-2">Passing</h6>
+                                            <div class="row">
+                                                <div class="col-6 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Total Passes:</span>
+                                                        <strong>{{ stat.passes }}</strong>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Pass Accuracy:</span>
+                                                        <strong>{{ stat.pass_accuracy }}%</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h6 class="mt-4 mb-3 border-bottom pb-2">Defensive</h6>
+                                            <div class="row">
+                                                <div class="col-6 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Tackles:</span>
+                                                        <strong>{{ stat.tackles }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h6 class="mt-4 mb-3 border-bottom pb-2">Discipline</h6>
+                                            <div class="row">
+                                                <div class="col-6 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Yellow Cards:</span>
+                                                        <strong>{{ stat.yellow_cards }}</strong>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Red Cards:</span>
+                                                        <strong>{{ stat.red_cards }}</strong>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Fouls Committed:</span>
+                                                        <strong>{{ stat.fouls_committed }}</strong>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Fouls Suffered:</span>
+                                                        <strong>{{ stat.fouls_suffered }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Statistics Summary -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0 d-flex align-items-center">
+                <i class="fas fa-chart-pie me-2"></i>Team Statistics Summary
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card bg-success bg-opacity-25">
+                        <h3>{{ game_stats|sum(attribute='goals') }}</h3>
+                        <p class="mb-0">Total Goals</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card bg-info bg-opacity-25">
+                        <h3>{{ game_stats|sum(attribute='assists') }}</h3>
+                        <p class="mb-0">Total Assists</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card bg-warning bg-opacity-25">
+                        <h3>{{ game_stats|sum(attribute='shots') }}</h3>
+                        <p class="mb-0">Total Shots</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card bg-danger bg-opacity-25">
+                        <h3>{{ game_stats|sum(attribute='yellow_cards') + game_stats|sum(attribute='red_cards') }}</h3>
+                        <p class="mb-0">Total Cards</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="text-center py-5">
+                <i class="fas fa-chart-bar fa-4x text-muted mb-3"></i>
+                <h5>No player statistics available</h5>
+                <p class="text-muted">No player statistics have been recorded for this event.</p>
+                {% if current_user.is_authenticated and current_user.is_admin() %}
+                    <a href="{{ url_for('events.add_game_stat', event_id=event.id) }}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus me-1"></i>Add Player Stats
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
