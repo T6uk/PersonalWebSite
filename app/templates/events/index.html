@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Events - Football Team Management{% endblock %}
+{% block title %}Events - FC Mara{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Team Events</h1>
+    <h1><i class="fas fa-calendar-alt me-2 text-primary"></i>Team Events</h1>
     {% if current_user.is_authenticated and current_user.is_admin() %}
     <div>
         <a href="{{ url_for('events.create') }}" class="btn btn-primary">
@@ -17,19 +17,24 @@
     {% endif %}
 </div>
 
-<div class="card">
-    <div class="card-body">
-        <ul class="nav nav-tabs mb-4" id="eventTabs" role="tablist">
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <ul class="nav nav-tabs card-header-tabs" id="eventTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">Upcoming</button>
+                <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">
+                    <i class="fas fa-calendar-day me-2"></i>Upcoming
+                </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab" aria-controls="past" aria-selected="false">Past</button>
+                <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab" aria-controls="past" aria-selected="false">
+                    <i class="fas fa-calendar-check me-2"></i>Past
+                </button>
             </li>
         </ul>
-
+    </div>
+    <div class="card-body p-0">
         <div class="tab-content" id="eventTabsContent">
-            <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+            <div class="tab-pane fade show active p-4" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
                 {% set current_datetime = now('object') %}
                 {% set upcoming_events = [] %}
                 {% for event in events.items %}
@@ -43,13 +48,19 @@
                         {% for event in upcoming_events %}
                             <a href="{{ url_for('events.detail', event_id=event.id) }}" class="list-group-item list-group-item-action">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-1">{{ event.title }}</h5>
-                                        <p class="mb-1">
-                                            <i class="fas fa-map-marker-alt me-1"></i>{{ event.location or 'Location TBD' }}
-                                            {% if event.opponent %}| <i class="fas fa-user-friends me-1"></i>{{ event.opponent }}{% endif %}
-                                        </p>
-                                        <small class="text-muted">{{ event.event_date.strftime('%d %b %Y, %H:%M') }}</small>
+                                    <div class="d-flex align-items-center">
+                                        <div class="event-calendar-icon bg-primary text-white rounded me-3 text-center p-2" style="width: 60px; height: 60px;">
+                                            <div class="small">{{ event.event_date.strftime('%b') }}</div>
+                                            <div class="fw-bold fs-4">{{ event.event_date.strftime('%d') }}</div>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">{{ event.title }}</h5>
+                                            <p class="mb-1">
+                                                <i class="fas fa-map-marker-alt me-1 text-muted"></i>{{ event.location or 'Location TBD' }}
+                                                {% if event.opponent %}| <i class="fas fa-user-friends me-1 text-muted"></i>{{ event.opponent }}{% endif %}
+                                            </p>
+                                            <small class="text-muted">{{ event.event_date.strftime('%H:%M') }}</small>
+                                        </div>
                                     </div>
                                     <span class="badge bg-primary rounded-pill">{{ event.event_type.name }}</span>
                                 </div>
@@ -57,13 +68,20 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>No upcoming events scheduled.
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar fa-4x text-muted mb-3"></i>
+                        <h5>No upcoming events scheduled</h5>
+                        <p class="text-muted">There are no events coming up in the near future.</p>
+                        {% if current_user.is_authenticated and current_user.is_admin() %}
+                        <a href="{{ url_for('events.create') }}" class="btn btn-primary mt-2">
+                            <i class="fas fa-plus me-1"></i>Add Event
+                        </a>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
 
-            <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+            <div class="tab-pane fade p-4" id="past" role="tabpanel" aria-labelledby="past-tab">
                 {% set current_datetime = now('object') %}
                 {% set past_events = [] %}
                 {% for event in events.items %}
@@ -77,15 +95,21 @@
                         {% for event in past_events %}
                             <a href="{{ url_for('events.detail', event_id=event.id) }}" class="list-group-item list-group-item-action">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-1">{{ event.title }}</h5>
-                                        <p class="mb-1">
-                                            {% if event.result %}
-                                                <span class="badge {{ event.result == 'Win' and 'bg-success' or event.result == 'Loss' and 'bg-danger' or 'bg-secondary' }} me-2">{{ event.result }}</span>
-                                            {% endif %}
-                                            {% if event.score %}{{ event.score }}{% endif %}
-                                        </p>
-                                        <small class="text-muted">{{ event.event_date.strftime('%d %b %Y, %H:%M') }}</small>
+                                    <div class="d-flex align-items-center">
+                                        <div class="event-calendar-icon bg-secondary text-white rounded me-3 text-center p-2" style="width: 60px; height: 60px;">
+                                            <div class="small">{{ event.event_date.strftime('%b') }}</div>
+                                            <div class="fw-bold fs-4">{{ event.event_date.strftime('%d') }}</div>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">{{ event.title }}</h5>
+                                            <p class="mb-1">
+                                                {% if event.result %}
+                                                    <span class="badge {{ event.result == 'Win' and 'bg-success' or event.result == 'Loss' and 'bg-danger' or 'bg-secondary' }} me-2">{{ event.result }}</span>
+                                                {% endif %}
+                                                {% if event.score %}{{ event.score }}{% endif %}
+                                            </p>
+                                            <small class="text-muted">{{ event.event_date.strftime('%d %b %Y, %H:%M') }}</small>
+                                        </div>
                                     </div>
                                     <span class="badge bg-primary rounded-pill">{{ event.event_type.name }}</span>
                                 </div>
@@ -93,34 +117,38 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>No past events found.
+                    <div class="text-center py-5">
+                        <i class="fas fa-history fa-4x text-muted mb-3"></i>
+                        <h5>No past events found</h5>
+                        <p class="text-muted">There are no previous events recorded in the system.</p>
                     </div>
                 {% endif %}
             </div>
         </div>
 
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
-                {% for page_num in events.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-                    {% if page_num %}
-                        {% if page_num == events.page %}
-                            <li class="page-item active">
-                                <a class="page-link" href="#">{{ page_num }}</a>
-                            </li>
+        <div class="card-footer bg-white">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% for page_num in events.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num == events.page %}
+                                <li class="page-item active">
+                                    <a class="page-link" href="#">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('events.index', page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% endif %}
                         {% else %}
-                            <li class="page-item">
-                                <a class="page-link" href="{{ url_for('events.index', page=page_num) }}">{{ page_num }}</a>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">...</a>
                             </li>
                         {% endif %}
-                    {% else %}
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#">...</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </nav>
+                    {% endfor %}
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
 {% endblock %}

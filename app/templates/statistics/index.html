@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Statistics - Football Team Management{% endblock %}
+{% block title %}Statistics - FC Mara{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Team Statistics</h1>
+    <h1><i class="fas fa-chart-pie me-2 text-primary"></i>Team Statistics</h1>
     {% if current_user.is_authenticated and current_user.is_admin() %}
     <div>
         <a href="{{ url_for('statistics.create_team_stat') }}" class="btn btn-primary me-2">
@@ -17,151 +17,188 @@
     {% endif %}
 </div>
 
-<ul class="nav nav-tabs mb-4" id="statsTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-controls="team" aria-selected="true">Team Stats</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button" role="tab" aria-controls="players" aria-selected="false">Player Stats</button>
-    </li>
-</ul>
-
-<div class="tab-content" id="statsTabsContent">
-    <div class="tab-pane fade show active" id="team" role="tabpanel" aria-labelledby="team-tab">
-        {% if team_stats %}
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">{{ team_stats.season }} Season</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 col-sm-6 mb-3">
-                            <div class="stat-card bg-success text-white">
-                                <h2>{{ team_stats.wins }}</h2>
-                                <p class="mb-0">Wins</p>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 mb-3">
-                            <div class="stat-card bg-danger text-white">
-                                <h2>{{ team_stats.losses }}</h2>
-                                <p class="mb-0">Losses</p>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 mb-3">
-                            <div class="stat-card bg-secondary text-white">
-                                <h2>{{ team_stats.draws }}</h2>
-                                <p class="mb-0">Draws</p>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 mb-3">
-                            <div class="stat-card bg-info text-white">
-                                <h2>{{ team_stats.league_position|ordinal }}</h2>
-                                <p class="mb-0">League Position</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-4 col-sm-6 mb-3">
-                            <div class="stat-card bg-light">
-                                <h3>{{ team_stats.goals_scored }}</h3>
-                                <p class="mb-0">Goals Scored</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-sm-6 mb-3">
-                            <div class="stat-card bg-light">
-                                <h3>{{ team_stats.goals_conceded }}</h3>
-                                <p class="mb-0">Goals Conceded</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-sm-6 mb-3">
-                            <div class="stat-card bg-light">
-                                <h3>{{ team_stats.clean_sheets }}</h3>
-                                <p class="mb-0">Clean Sheets</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="text-center mt-3">
-                        <a href="{{ url_for('statistics.team') }}" class="btn btn-primary">View All Seasons</a>
-                    </div>
-                </div>
-            </div>
-        {% else %}
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>No team statistics available.
-                {% if current_user.is_authenticated and current_user.is_admin() %}
-                <a href="{{ url_for('statistics.create_team_stat') }}" class="alert-link">Add team statistics</a>
-                {% endif %}
-            </div>
-        {% endif %}
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <ul class="nav nav-tabs card-header-tabs" id="statsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-controls="team" aria-selected="true">
+                    <i class="fas fa-users me-2"></i>Team Stats
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button" role="tab" aria-controls="players" aria-selected="false">
+                    <i class="fas fa-user me-2"></i>Player Stats
+                </button>
+            </li>
+        </ul>
     </div>
+    <div class="card-body">
+        <div class="tab-content" id="statsTabsContent">
+            <div class="tab-pane fade show active" id="team" role="tabpanel" aria-labelledby="team-tab">
+                {% if team_stats %}
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">{{ team_stats.season }} Season</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="stat-card bg-success text-white">
+                                        <h2 class="display-4 fw-bold">{{ team_stats.wins }}</h2>
+                                        <p class="mb-0 fw-medium">Wins</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="stat-card bg-danger text-white">
+                                        <h2 class="display-4 fw-bold">{{ team_stats.losses }}</h2>
+                                        <p class="mb-0 fw-medium">Losses</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="stat-card bg-secondary text-white">
+                                        <h2 class="display-4 fw-bold">{{ team_stats.draws }}</h2>
+                                        <p class="mb-0 fw-medium">Draws</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="stat-card bg-info text-white">
+                                        <h2 class="display-4 fw-bold">{{ team_stats.league_position|ordinal }}</h2>
+                                        <p class="mb-0 fw-medium">League Position</p>
+                                    </div>
+                                </div>
+                            </div>
 
-    <div class="tab-pane fade" id="players" role="tabpanel" aria-labelledby="players-tab">
-        {% if top_scorers %}
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Top Scorers</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Player</th>
-                                    <th class="text-center">Goals</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for player, goals in top_scorers %}
-                                    <tr>
-                                        <td>{{ loop.index }}</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <img src="{{ url_for('static', filename='uploads/profiles/' + player.profile_picture) }}" alt="{{ player.first_name }}" class="rounded-circle me-2" width="40" height="40">
-                                                <div>{{ player.first_name }} {{ player.last_name }}</div>
-                                            </div>
-                                        </td>
-                                        <td class="text-center">{{ goals }}</td>
-                                        <td class="text-end">
-                                            <a href="{{ url_for('statistics.player_detail', player_id=player.id) }}" class="btn btn-sm btn-outline-primary">View Stats</a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="stat-card bg-light border">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-futbol me-3 text-primary fa-2x"></i>
+                                            <h3 class="display-5 fw-bold mb-0">{{ team_stats.goals_scored }}</h3>
+                                        </div>
+                                        <p class="mb-0 mt-2 fw-medium">Goals Scored</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="stat-card bg-light border">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-futbol me-3 text-danger fa-2x"></i>
+                                            <h3 class="display-5 fw-bold mb-0">{{ team_stats.goals_conceded }}</h3>
+                                        </div>
+                                        <p class="mb-0 mt-2 fw-medium">Goals Conceded</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="stat-card bg-light border">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-shield-alt me-3 text-success fa-2x"></i>
+                                            <h3 class="display-5 fw-bold mb-0">{{ team_stats.clean_sheets }}</h3>
+                                        </div>
+                                        <p class="mb-0 mt-2 fw-medium">Clean Sheets</p>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div class="text-center mt-3">
-                        <a href="{{ url_for('statistics.players') }}" class="btn btn-primary">View All Players</a>
+                            <div class="text-center mt-4">
+                                <a href="{{ url_for('statistics.team') }}" class="btn btn-primary">
+                                    <i class="fas fa-chart-line me-1"></i>View All Seasons
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        {% else %}
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>No player statistics available.
-                {% if current_user.is_authenticated and current_user.is_admin() %}
-                <a href="{{ url_for('statistics.create_player_stat') }}" class="alert-link">Add player statistics</a>
+                {% else %}
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fas fa-info-circle me-3 fs-3"></i>
+                        <div>
+                            No team statistics available.
+                            {% if current_user.is_authenticated and current_user.is_admin() %}
+                            <a href="{{ url_for('statistics.create_team_stat') }}" class="alert-link">Add team statistics</a>
+                            {% endif %}
+                        </div>
+                    </div>
                 {% endif %}
             </div>
-        {% endif %}
 
-        {% if seasons %}
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Available Seasons</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex flex-wrap">
-                        {% for season in seasons %}
-                            <a href="{{ url_for('statistics.players', season=season[0]) }}" class="btn btn-outline-primary me-2 mb-2">{{ season[0] }}</a>
-                        {% endfor %}
+            <div class="tab-pane fade" id="players" role="tabpanel" aria-labelledby="players-tab">
+                {% if top_scorers %}
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-star me-2"></i>Top Scorers</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="50">#</th>
+                                            <th>Player</th>
+                                            <th class="text-center">Goals</th>
+                                            <th width="150"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for player, goals in top_scorers %}
+                                            <tr>
+                                                <td>
+                                                    <span class="fw-bold">{{ loop.index }}</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ url_for('static', filename='uploads/profiles/' + player.profile_picture) }}" alt="{{ player.first_name }}" class="rounded-circle me-3" width="50" height="50">
+                                                        <div>
+                                                            <h6 class="mb-0">{{ player.first_name }} {{ player.last_name }}</h6>
+                                                            <small class="text-muted">{{ player.username }}</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-success rounded-pill fs-6 px-3">{{ goals }}</span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <a href="{{ url_for('statistics.player_detail', player_id=player.id) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-chart-line me-1"></i>View Stats
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="text-center mt-3">
+                                <a href="{{ url_for('statistics.players') }}" class="btn btn-primary">
+                                    <i class="fas fa-users me-1"></i>View All Players
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {% else %}
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fas fa-info-circle me-3 fs-3"></i>
+                        <div>
+                            No player statistics available.
+                            {% if current_user.is_authenticated and current_user.is_admin() %}
+                            <a href="{{ url_for('statistics.create_player_stat') }}" class="alert-link">Add player statistics</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if seasons %}
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Available Seasons</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap">
+                                {% for season in seasons %}
+                                    <a href="{{ url_for('statistics.players', season=season[0]) }}" class="btn btn-outline-primary me-2 mb-2">{{ season[0] }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
-        {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}
