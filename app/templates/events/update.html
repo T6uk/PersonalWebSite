@@ -44,15 +44,18 @@
                         <div class="col-md-6">
                             {{ form.event_date.label(class="form-label") }}
                             {% if form.event_date.errors %}
-                                {{ form.event_date(class="form-control is-invalid", type="datetime-local") }}
+                                <input type="datetime-local" name="event_date" id="event_date" class="form-control is-invalid" required
+                                       value="{{ event.event_date.strftime('%Y-%m-%dT%H:%M') }}">
                                 <div class="invalid-feedback">
                                     {% for error in form.event_date.errors %}
                                         {{ error }}
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form.event_date(class="form-control", type="datetime-local") }}
+                                <input type="datetime-local" name="event_date" id="event_date" class="form-control" required
+                                       value="{{ event.event_date.strftime('%Y-%m-%dT%H:%M') }}">
                             {% endif %}
+                            <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM</small>
                         </div>
                     </div>
 

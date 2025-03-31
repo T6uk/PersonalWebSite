@@ -44,15 +44,16 @@
                         <div class="col-md-6">
                             {{ form.event_date.label(class="form-label") }}
                             {% if form.event_date.errors %}
-                                {{ form.event_date(class="form-control is-invalid", type="datetime-local", step="1") }}
+                                <input type="datetime-local" name="event_date" id="event_date" class="form-control is-invalid" required>
                                 <div class="invalid-feedback">
                                     {% for error in form.event_date.errors %}
                                         {{ error }}
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form.event_date(class="form-control", type="datetime-local", step="1") }}
+                                <input type="datetime-local" name="event_date" id="event_date" class="form-control" required>
                             {% endif %}
+                            <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM</small>
                         </div>
                     </div>
 
@@ -137,4 +138,22 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Set default date to today
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get current datetime in format YYYY-MM-DDTHH:MM
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+
+        const defaultDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+        document.getElementById('event_date').value = defaultDateTime;
+    });
+</script>
 {% endblock %}

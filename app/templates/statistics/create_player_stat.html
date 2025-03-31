@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Create Player Statistics - Football Team Management{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">Create Player Statistics</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.player.label(class="form-label") }}
+                            {% if form.player.errors %}
+                                {{ form.player(class="form-select is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.player.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.player(class="form-select") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.season.label(class="form-label") }}
+                            {% if form.season.errors %}
+                                {{ form.season(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.season.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.season(class="form-control") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.appearances.label(class="form-label") }}
+                            {% if form.appearances.errors %}
+                                {{ form.appearances(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.appearances.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.appearances(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.minutes_played.label(class="form-label") }}
+                            {% if form.minutes_played.errors %}
+                                {{ form.minutes_played(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.minutes_played.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.minutes_played(class="form-control") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            {{ form.goals.label(class="form-label") }}
+                            {% if form.goals.errors %}
+                                {{ form.goals(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.goals.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.goals(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.assists.label(class="form-label") }}
+                            {% if form.assists.errors %}
+                                {{ form.assists(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.assists.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.assists(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-6">
+                                    {{ form.yellow_cards.label(class="form-label") }}
+                                    {% if form.yellow_cards.errors %}
+                                        {{ form.yellow_cards(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.yellow_cards.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.yellow_cards(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                                <div class="col-6">
+                                    {{ form.red_cards.label(class="form-label") }}
+                                    {% if form.red_cards.errors %}
+                                        {{ form.red_cards(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.red_cards.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.red_cards(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary") }}
+                        <a href="{{ url_for('statistics.players') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
