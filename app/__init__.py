@@ -99,3 +99,28 @@ def create_admin_user():
 
     print('Created admin user: admin@example.com / admin123')
     print('Please change this password immediately after first login')
+
+
+def init_event_types():
+    """Initialize default event types if they don't exist."""
+    from app.models.event import EventType
+    from app.extensions import db
+
+    # Default event types
+    event_types = [
+        {'name': 'Tournament', 'description': 'A tournament consisting of multiple games'},
+        {'name': 'League Match', 'description': 'Regular league match'},
+        {'name': 'Cup Match', 'description': 'Cup competition match'},
+        {'name': 'Friendly', 'description': 'Friendly match'},
+        {'name': 'Training', 'description': 'Team training session'}
+    ]
+
+    # Check and create event types
+    for et in event_types:
+        existing = EventType.query.filter_by(name=et['name']).first()
+        if not existing:
+            event_type = EventType(name=et['name'], description=et['description'])
+            db.session.add(event_type)
+
+    db.session.commit()
+    print('Event types initialized')
