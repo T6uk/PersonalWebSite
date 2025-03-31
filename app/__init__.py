@@ -41,6 +41,7 @@ def create_app(config_class=Config):
     from app.statistics.routes import statistics
     from app.trophies.routes import trophies
     from app.errors import errors
+    from app.tournaments.routes import tournaments
 
     app.register_blueprint(auth, url_prefix='/auth')
     app.register_blueprint(admin, url_prefix='/admin')
@@ -49,6 +50,7 @@ def create_app(config_class=Config):
     app.register_blueprint(statistics, url_prefix='/statistics')
     app.register_blueprint(trophies, url_prefix='/trophies')
     app.register_blueprint(errors)
+    app.register_blueprint(tournaments, url_prefix='/tournaments')
 
     # Main route
     from flask import render_template
