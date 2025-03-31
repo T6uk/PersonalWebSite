@@ -48,113 +48,119 @@ def create():
 
     return render_template('events/create.html', title='Create Event', form=form)
 
-    @events.route('/update/<int:event_id>', methods=['GET', 'POST'])
-    @login_required
-    @admin_required
-    def update(event_id):
-        event = Event.query.get_or_404(event_id)
-        form = EventForm()
 
-        if form.validate_on_submit():
-            event.title = form.title.data
-            event.event_type_id = form.event_type.data
-            event.opponent = form.opponent.data
-            event.location = form.location.data
-            event.event_date = form.event_date.data
-            event.description = form.description.data
-            event.result = form.result.data
-            event.score = form.score.data
+@events.route('/update/<int:event_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def update(event_id):
+    event = Event.query.get_or_404(event_id)
+    form = EventForm()
 
-            db.session.commit()
+    if form.validate_on_submit():
+        event.title = form.title.data
+        event.event_type_id = form.event_type.data
+        event.opponent = form.opponent.data
+        event.location = form.location.data
+        event.event_date = form.event_date.data
+        event.description = form.description.data
+        event.result = form.result.data
+        event.score = form.score.data
 
-            flash('Event has been updated!', 'success')
-            return redirect(url_for('events.detail', event_id=event.id))
-        elif request.method == 'GET':
-            form.title.data = event.title
-            form.event_type.data = event.event_type_id
-            form.opponent.data = event.opponent
-            form.location.data = event.location
-            form.event_date.data = event.event_date
-            form.description.data = event.description
-            form.result.data = event.result
-            form.score.data = event.score
-
-        return render_template('events/update.html', title='Update Event', form=form, event=event)
-
-    @events.route('/delete/<int:event_id>', methods=['POST'])
-    @login_required
-    @admin_required
-    def delete(event_id):
-        event = Event.query.get_or_404(event_id)
-
-        db.session.delete(event)
         db.session.commit()
 
-        flash('Event has been deleted!', 'success')
-        return redirect(url_for('events.index'))
+        flash('Event has been updated!', 'success')
+        return redirect(url_for('events.detail', event_id=event.id))
+    elif request.method == 'GET':
+        form.title.data = event.title
+        form.event_type.data = event.event_type_id
+        form.opponent.data = event.opponent
+        form.location.data = event.location
+        form.event_date.data = event.event_date
+        form.description.data = event.description
+        form.result.data = event.result
+        form.score.data = event.score
 
-    @events.route('/types')
-    @login_required
-    @admin_required
-    def event_types():
-        event_types = EventType.query.all()
-        return render_template('events/types.html', title='Event Types', event_types=event_types)
+    return render_template('events/update.html', title='Update Event', form=form, event=event)
 
-    @events.route('/types/create', methods=['GET', 'POST'])
-    @login_required
-    @admin_required
-    def create_event_type():
-        form = EventTypeForm()
 
-        if form.validate_on_submit():
-            event_type = EventType(
-                name=form.name.data,
-                description=form.description.data
-            )
+@events.route('/delete/<int:event_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete(event_id):
+    event = Event.query.get_or_404(event_id)
 
-            db.session.add(event_type)
-            db.session.commit()
+    db.session.delete(event)
+    db.session.commit()
 
-            flash('Event type has been created!', 'success')
-            return redirect(url_for('events.event_types'))
+    flash('Event has been deleted!', 'success')
+    return redirect(url_for('events.index'))
 
-        return render_template('events/create_type.html', title='Create Event Type', form=form)
 
-    @events.route('/types/update/<int:type_id>', methods=['GET', 'POST'])
-    @login_required
-    @admin_required
-    def update_event_type(type_id):
-        event_type = EventType.query.get_or_404(type_id)
-        form = EventTypeForm()
+@events.route('/types')
+@login_required
+@admin_required
+def event_types():
+    event_types = EventType.query.all()
+    return render_template('events/types.html', title='Event Types', event_types=event_types)
 
-        if form.validate_on_submit():
-            event_type.name = form.name.data
-            event_type.description = form.description.data
 
-            db.session.commit()
+@events.route('/types/create', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def create_event_type():
+    form = EventTypeForm()
 
-            flash('Event type has been updated!', 'success')
-            return redirect(url_for('events.event_types'))
-        elif request.method == 'GET':
-            form.name.data = event_type.name
-            form.description.data = event_type.description
+    if form.validate_on_submit():
+        event_type = EventType(
+            name=form.name.data,
+            description=form.description.data
+        )
 
-        return render_template('events/update_type.html', title='Update Event Type', form=form, event_type=event_type)
-
-    @events.route('/types/delete/<int:type_id>', methods=['POST'])
-    @login_required
-    @admin_required
-    def delete_event_type(type_id):
-        event_type = EventType.query.get_or_404(type_id)
-
-        # Check if there are events using this type
-        events_count = Event.query.filter_by(event_type_id=type_id).count()
-        if events_count > 0:
-            flash(f'Cannot delete this event type because it is used by {events_count} events.', 'danger')
-            return redirect(url_for('events.event_types'))
-
-        db.session.delete(event_type)
+        db.session.add(event_type)
         db.session.commit()
 
-        flash('Event type has been deleted!', 'success')
+        flash('Event type has been created!', 'success')
         return redirect(url_for('events.event_types'))
+
+    return render_template('events/create_type.html', title='Create Event Type', form=form)
+
+
+@events.route('/types/update/<int:type_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def update_event_type(type_id):
+    event_type = EventType.query.get_or_404(type_id)
+    form = EventTypeForm()
+
+    if form.validate_on_submit():
+        event_type.name = form.name.data
+        event_type.description = form.description.data
+
+        db.session.commit()
+
+        flash('Event type has been updated!', 'success')
+        return redirect(url_for('events.event_types'))
+    elif request.method == 'GET':
+        form.name.data = event_type.name
+        form.description.data = event_type.description
+
+    return render_template('events/update_type.html', title='Update Event Type', form=form, event_type=event_type)
+
+
+@events.route('/types/delete/<int:type_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_event_type(type_id):
+    event_type = EventType.query.get_or_404(type_id)
+
+    # Check if there are events using this type
+    events_count = Event.query.filter_by(event_type_id=type_id).count()
+    if events_count > 0:
+        flash(f'Cannot delete this event type because it is used by {events_count} events.', 'danger')
+        return redirect(url_for('events.event_types'))
+
+    db.session.delete(event_type)
+    db.session.commit()
+
+    flash('Event type has been deleted!', 'success')
+    return redirect(url_for('events.event_types'))

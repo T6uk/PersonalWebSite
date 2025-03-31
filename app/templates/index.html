@@ -1,173 +1,141 @@
 {% extends "base.html" %}
 
-{% block title %}Home - FC Mara{% endblock %}
+{% block title %}Trophy Cabinet - FC Mara{% endblock %}
 
 {% block content %}
-<div class="jumbotron bg-primary rounded-3 mb-5 text-center text-white">
-    <div class="container py-4">
-        <h1 class="display-4 fw-bold">Welcome to FC Mara</h1>
-        <p class="lead fs-4">Professional football team management platform</p>
-        <hr class="my-4 opacity-25">
-        <p class="mb-4">Access team events, player statistics, and trophy cabinet all in one place.</p>
-        {% if not current_user.is_authenticated %}
-            <a class="btn btn-light btn-lg px-4 shadow-sm" href="{{ url_for('auth.login') }}" role="button">
-                <i class="fas fa-sign-in-alt me-2"></i>Login
-            </a>
-        {% else %}
-            {% if current_user.is_admin() %}
-                <a class="btn btn-light btn-lg px-4 shadow-sm" href="{{ url_for('admin.dashboard') }}" role="button">
-                    <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
-                </a>
-            {% else %}
-                <a class="btn btn-light btn-lg px-4 shadow-sm" href="{{ url_for('players.dashboard') }}" role="button">
-                    <i class="fas fa-user me-2"></i>Player Dashboard
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-trophy me-2 text-warning"></i>Trophy Cabinet</h1>
+    {% if current_user.is_authenticated and current_user.is_admin() %}
+    <div>
+        <a href="{{ url_for('trophies.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Add Trophy
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+{% if trophies_by_year %}
+    {% for year, trophies in trophies_by_year.items() %}
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>{{ year }}</h5>
+                <span class="badge bg-light text-primary">{{ trophies|length }} trophies</span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for trophy in trophies %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100 trophy-card border-0 shadow-sm">
+                                <div class="text-center p-4">
+                                    <img src="{{ url_for('static', filename='uploads/trophies/' + trophy.image) }}"
+                                         alt="{{ trophy.name }}"
+                                         class="img-fluid trophy-image"
+                                         style="max-height: 180px;">
+                                </div>
+                                <div class="card-body text-center pb-4">
+                                    <div class="badge bg-primary mb-2 px-3 py-2">{{ trophy.competition }}</div>
+                                    <h5 class="card-title fw-bold">{{ trophy.name }}</h5>
+                                    <p class="card-text mb-4">{{ trophy.description|truncate(100) }}</p>
+                                    <a href="{{ url_for('trophies.detail', trophy_id=trophy.id) }}" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="text-center py-5 card shadow-sm">
+        <div class="card-body py-5">
+            <i class="fas fa-trophy text-muted fa-5x mb-4"></i>
+            <h3 class="text-muted">No trophies in the cabinet yet</h3>
+            <p class="text-muted">Trophies will be displayed here once they are added.</p>
+            {% if current_user.is_authenticated and current_user.is_admin() %}
+                <a href="{{ url_for('trophies.create') }}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus me-1"></i>Add First Trophy
                 </a>
             {% endif %}
-        {% endif %}
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <div class="card-header bg-primary text-white">
-                <h5 class="card-title mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Events</h5>
-            </div>
-            <div class="card-body">
-                {% set upcoming_events = get_upcoming_events(3) %}
-                {% if upcoming_events %}
-                    <div class="list-group">
-                        {% for event in upcoming_events %}
-                            <div class="list-group-item event-card">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">{{ event.title }}</h6>
-                                        <p class="mb-1 text-muted">
-                                            <i class="fas fa-map-marker-alt me-1"></i> {{ event.location or 'TBD' }}
-                                        </p>
-                                        <small class="text-muted">{{ event.event_date.strftime('%d %b %Y, %H:%M') }}</small>
-                                    </div>
-                                    <span class="badge bg-primary rounded-pill">{{ event.event_type.name }}</span>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div class="mt-4 text-center">
-                        <a href="{{ url_for('events.index') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-calendar-alt me-1"></i> View All Events
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-calendar-times text-muted fa-3x mb-3"></i>
-                        <p class="text-muted">No upcoming events scheduled.</p>
-                    </div>
-                {% endif %}
-            </div>
         </div>
     </div>
+{% endif %}
 
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <div class="card-header bg-primary text-white">
-                <h5 class="card-title mb-0"><i class="fas fa-chart-line me-2"></i>Team Statistics</h5>
+<div class="card mt-5 bg-primary text-white border-0 shadow">
+    <div class="card-body p-0">
+        <div class="row g-0">
+            <div class="col-md-6 p-4 p-md-5">
+                <h3 class="fw-bold">FC Mara's Legacy</h3>
+                <p class="lead">Our trophy cabinet showcases the team's achievements throughout the years.</p>
+                <p>Each trophy represents countless hours of dedication, teamwork, and perseverance from players, coaches, and staff.</p>
+                <a href="#" class="btn btn-light mt-3">
+                    <i class="fas fa-history me-1"></i>Team History
+                </a>
             </div>
-            <div class="card-body">
-                {% set team_stats = get_latest_team_stats() %}
-                {% if team_stats %}
-                    <div class="text-center mb-4">
-                        <h5 class="fw-bold mb-3">{{ team_stats.season }} Season</h5>
-                    </div>
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <div class="stat-card bg-success text-white">
-                                <h2>{{ team_stats.wins }}</h2>
-                                <p class="mb-0">Wins</p>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="stat-card bg-danger text-white">
-                                <h2>{{ team_stats.losses }}</h2>
-                                <p class="mb-0">Losses</p>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="stat-card bg-secondary text-white">
-                                <h2>{{ team_stats.draws }}</h2>
-                                <p class="mb-0">Draws</p>
+            <div class="col-md-6 bg-white text-dark p-4 p-md-5">
+                <h4 class="fw-bold mb-4">Trophy Statistics</h4>
+                <div class="row">
+                    <div class="col-6 mb-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center p-3">
+                                <h2 class="fw-bold text-primary">{{ trophies_by_year.keys()|list|length if trophies_by_year else 0 }}</h2>
+                                <p class="text-muted mb-0">Winning Years</p>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-4 text-center">
-                        <a href="{{ url_for('statistics.team') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-chart-line me-1"></i> View Details
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-chart-area text-muted fa-3x mb-3"></i>
-                        <p class="text-muted">No statistics available.</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <div class="card-header bg-primary text-white">
-                <h5 class="card-title mb-0"><i class="fas fa-trophy me-2"></i>Recent Trophies</h5>
-            </div>
-            <div class="card-body">
-                {% set recent_trophies = get_recent_trophies(3) %}
-                {% if recent_trophies %}
-                    <div class="list-group">
-                        {% for trophy in recent_trophies %}
-                            <div class="list-group-item">
-                                <div class="d-flex align-items-center">
-                                    <div class="trophy-thumbnail me-3">
-                                        <img src="{{ url_for('static', filename='uploads/trophies/' + trophy.image) }}" alt="{{ trophy.name }}" class="img-fluid">
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-0">{{ trophy.name }}</h6>
-                                        <small class="text-muted">{{ trophy.competition }} ({{ trophy.year }})</small>
-                                    </div>
-                                </div>
+                    <div class="col-6 mb-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center p-3">
+                                {% set total_trophies = 0 %}
+                                {% if trophies_by_year %}
+                                    {% for year_trophies in trophies_by_year.values() %}
+                                        {% set total_trophies = total_trophies + year_trophies|length %}
+                                    {% endfor %}
+                                {% endif %}
+                                <h2 class="fw-bold text-primary">{{ total_trophies }}</h2>
+                                <p class="text-muted mb-0">Total Trophies</p>
                             </div>
-                        {% endfor %}
+                        </div>
                     </div>
-                    <div class="mt-4 text-center">
-                        <a href="{{ url_for('trophies.index') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-trophy me-1"></i> View Trophy Cabinet
-                        </a>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="bg-warning text-white rounded-circle p-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-medal"></i>
+                        </div>
                     </div>
-                {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-award text-muted fa-3x mb-3"></i>
-                        <p class="text-muted">No trophies available.</p>
+                    <div>
+                        <h6 class="fw-bold mb-0">Most Successful Year</h6>
+                        {% if trophies_by_year %}
+                            {% set most_trophies = 0 %}
+                            {% set most_trophies_year = None %}
+                            {% for year, year_trophies in trophies_by_year.items() %}
+                                {% if year_trophies|length > most_trophies %}
+                                    {% set most_trophies = year_trophies|length %}
+                                    {% set most_trophies_year = year %}
+                                {% endif %}
+                            {% endfor %}
+                            <p class="mb-0">{{ most_trophies_year }} ({{ most_trophies }} trophies)</p>
+                        {% else %}
+                            <p class="mb-0">No trophies yet</p>
+                        {% endif %}
                     </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="card-title mb-0"><i class="fas fa-bullhorn me-2"></i>About FC Mara</h5>
-            </div>
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-md-6 mb-4 mb-md-0">
-                        <h4>Our Team</h4>
-                        <p>FC Mara is a professional football team with a rich history of victories and community involvement. Our mission is to excel in the sport while maintaining the highest standards of sportsmanship and teamwork.</p>
-                        <p>Founded in 1995, our club has grown to become one of the most respected teams in the league, with numerous championships and accolades to our name.</p>
-                        <a href="#" class="btn btn-outline-primary mt-2">Learn More About Our Team</a>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="bg-info text-white rounded-circle p-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-award"></i>
+                        </div>
                     </div>
-                    <div class="col-md-6 text-center">
-                        <img src="{{ url_for('static', filename='img/team.jpg') }}" alt="FC Mara Team" class="img-fluid rounded shadow" onerror="this.src='/api/placeholder/500/300'; this.onerror=null;">
+                    <div>
+                        <h6 class="fw-bold mb-0">Latest Achievement</h6>
+                        {% if trophies_by_year %}
+                            {% set latest_year = trophies_by_year.keys()|list|first %}
+                            <p class="mb-0">{{ latest_year }} Season</p>
+                        {% else %}
+                            <p class="mb-0">No achievements yet</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

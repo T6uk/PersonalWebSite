@@ -30,9 +30,12 @@ def utility_processor():
         from app.models.trophy import Trophy
         return Trophy.query.filter(Trophy.year == year, Trophy.id != current_id).limit(limit).all()
 
-    def now(format='%Y'):
-        """Get current date/time in specified format."""
-        return datetime.utcnow().strftime(format)
+    def now(format=None):
+        """Get current date/time in specified format or as datetime object."""
+        current_time = datetime.utcnow()
+        if format:
+            return current_time.strftime(format)
+        return current_time
 
     return dict(
         get_upcoming_events=get_upcoming_events,

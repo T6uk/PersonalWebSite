@@ -264,23 +264,28 @@
                     <div class="col-md-7">
                         <h6 class="fw-bold">Team Performance Metrics</h6>
                         <div class="progress mb-3" style="height: 10px;">
+                            {% set total_matches = team_stats.wins + team_stats.losses + team_stats.draws %}
+                            {% set win_rate = (team_stats.wins / total_matches * 100) if total_matches > 0 else 0 %}
                             <div class="progress-bar bg-success" role="progressbar"
-                                 style="width: {{ (team_stats.wins / (team_stats.wins + team_stats.losses + team_stats.draws)) * 100 }}%;"
-                                 aria-valuenow="{{ (team_stats.wins / (team_stats.wins + team_stats.losses + team_stats.draws)) * 100 }}"
+                                 style="width: {{ win_rate }}%;"
+                                 aria-valuenow="{{ win_rate }}"
                                  aria-valuemin="0" aria-valuemax="100">Win Rate
                             </div>
                         </div>
                         <div class="progress mb-3" style="height: 10px;">
+                            {% set clean_sheet_rate = (team_stats.clean_sheets / total_matches * 100) if total_matches > 0 else 0 %}
                             <div class="progress-bar bg-info" role="progressbar"
-                                 style="width: {{ (team_stats.clean_sheets / (team_stats.wins + team_stats.losses + team_stats.draws)) * 100 }}%;"
-                                 aria-valuenow="{{ (team_stats.clean_sheets / (team_stats.wins + team_stats.losses + team_stats.draws)) * 100 }}"
+                                 style="width: {{ clean_sheet_rate }}%;"
+                                 aria-valuenow="{{ clean_sheet_rate }}"
                                  aria-valuemin="0" aria-valuemax="100">Clean Sheet Rate
                             </div>
                         </div>
                         <div class="progress mb-3" style="height: 10px;">
+                            {% set total_goals = team_stats.goals_scored + team_stats.goals_conceded %}
+                            {% set goal_ratio = (team_stats.goals_scored / total_goals * 100) if total_goals > 0 else 50 %}
                             <div class="progress-bar bg-warning" role="progressbar"
-                                 style="width: {{ (team_stats.goals_scored / (team_stats.goals_scored + team_stats.goals_conceded)) * 100 }}%;"
-                                 aria-valuenow="{{ (team_stats.goals_scored / (team_stats.goals_scored + team_stats.goals_conceded)) * 100 }}"
+                                 style="width: {{ goal_ratio }}%;"
+                                 aria-valuenow="{{ goal_ratio }}"
                                  aria-valuemin="0" aria-valuemax="100">Goal Ratio
                             </div>
                         </div>
@@ -309,20 +314,20 @@
                                 <h6 class="text-center mb-3">Goals Scored vs Conceded</h6>
                                 <div class="d-flex align-items-center justify-content-center mb-3">
                                     <div class="text-center me-4">
-                                        <h2 class="mb-0 text-success">{{ team_stats.goals_scored if team_stats else 0
-                                            }}</h2>
+                                        <h2 class="mb-0 text-success">{{ team_stats.goals_scored if team_stats else 0 }}</h2>
                                         <small class="text-muted">Scored</small>
                                     </div>
                                     <div class="text-center">
-                                        <h2 class="mb-0 text-danger">{{ team_stats.goals_conceded if team_stats else 0
-                                            }}</h2>
+                                        <h2 class="mb-0 text-danger">{{ team_stats.goals_conceded if team_stats else 0 }}</h2>
                                         <small class="text-muted">Conceded</small>
                                     </div>
                                 </div>
                                 <div class="progress" style="height: 10px;">
+                                    {% set total_goals = (team_stats.goals_scored if team_stats else 0) + (team_stats.goals_conceded if team_stats else 0) %}
+                                    {% set scored_percent = ((team_stats.goals_scored if team_stats else 0) / total_goals * 100) if total_goals > 0 else 50 %}
                                     <div class="progress-bar bg-success" role="progressbar"
-                                         style="width: {{ ((team_stats.goals_scored if team_stats else 0) / ((team_stats.goals_scored if team_stats else 0) + (team_stats.goals_conceded if team_stats else 1))) * 100 }}%"
-                                         aria-valuenow="{{ ((team_stats.goals_scored if team_stats else 0) / ((team_stats.goals_scored if team_stats else 0) + (team_stats.goals_conceded if team_stats else 1))) * 100 }}"
+                                         style="width: {{ scored_percent }}%"
+                                         aria-valuenow="{{ scored_percent }}"
                                          aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             </div>
@@ -333,7 +338,8 @@
                             <div class="card-body">
                                 <h6 class="text-center mb-3">League Position Trend</h6>
                                 <div class="text-center mb-3">
-                                    <span class="badge {{ (team_stats.league_position if team_stats else 0) <= 3 ? 'bg-success' : ((team_stats.league_position if team_stats else 0) <= 6 ? 'bg-primary' : 'bg-secondary') }} px-3 py-2">
+                                    {% set position_class = 'bg-success' if team_stats and team_stats.league_position <= 3 else ('bg-primary' if team_stats and team_stats.league_position <= 6 else 'bg-secondary') %}
+                                    <span class="badge {{ position_class }} px-3 py-2">
                                         <i class="fas fa-trophy me-1"></i>{{ team_stats.league_position|ordinal if team_stats else 'N/A' }}
                                     </span>
                                 </div>
@@ -363,9 +369,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        {%
-            if team_stats %
-        }
+        {% if team_stats %}
         // Results Chart
         var resultsCtx = document.getElementById('resultsChart').getContext('2d');
         var resultsChart = new Chart(resultsCtx, {
@@ -374,47 +378,30 @@
                 labels: ['Wins', 'Draws', 'Losses'],
                 datasets: [{
                     label: 'Match Results',
-                    data: [{{team_stats.wins}
-                }, {{team_stats.draws}
+                    data: [{{ team_stats.wins }}, {{ team_stats.draws }}, {{ team_stats.losses }}],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(108, 117, 125, 0.8)',
+                        'rgba(220, 53, 69, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(108, 117, 125, 1)',
+                        'rgba(220, 53, 69, 1)'
+                    ],
+                    borderWidth: 1
+                }]
             },
-        {
-            {
-                team_stats.losses
-            }
-        }
-    ],
-        backgroundColor: [
-            'rgba(40, 167, 69, 0.8)',
-            'rgba(108, 117, 125, 0.8)',
-            'rgba(220, 53, 69, 0.8)'
-        ],
-            borderColor
-    :
-        [
-            'rgba(40, 167, 69, 1)',
-            'rgba(108, 117, 125, 1)',
-            'rgba(220, 53, 69, 1)'
-        ],
-            borderWidth
-    :
-        1
-    }]
-    },
-        options: {
-            responsive: true,
-                maintainAspectRatio
-        :
-            false,
-                plugins
-        :
-            {
-                legend: {
-                    position: 'bottom'
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
                 }
             }
-        }
-    })
-        ;
+        });
 
         // Goals Chart
         var goalsCtx = document.getElementById('goalsChart').getContext('2d');
@@ -425,52 +412,40 @@
                 datasets: [
                     {
                         label: 'Goals Scored',
-                        data: [{{team_stats.goals_scored}
-                    }],
-                backgroundColor: 'rgba(40, 167, 69, 0.8)',
-                borderColor: 'rgba(40, 167, 69, 1)',
-                borderWidth: 1
+                        data: [{{ team_stats.goals_scored }}],
+                        backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Goals Conceded',
+                        data: [{{ team_stats.goals_conceded }}],
+                        backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 1
+                    }
+                ]
             },
-        {
-            label: 'Goals Conceded',
-                data
-        :
-            [{{team_stats.goals_conceded}
-        }],
-            backgroundColor: 'rgba(220, 53, 69, 0.8)',
-                borderColor
-        :
-            'rgba(220, 53, 69, 1)',
-                borderWidth
-        :
-            1
-        }
-    ]
-    },
-        options: {
-            responsive: true,
-                maintainAspectRatio
-        :
-            false,
-                plugins
-        :
-            {
-                legend: {
-                    position: 'bottom'
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        ,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    })
-        ;
+        });
 
         // Win Rate Chart
         var winRateCtx = document.getElementById('winRateChart').getContext('2d');
+        {% set total_matches = team_stats.wins + team_stats.losses + team_stats.draws %}
+        {% set win_rate = (team_stats.wins / total_matches * 100) if total_matches > 0 else 0 %}
         var winRateChart = new Chart(winRateCtx, {
             type: 'doughnut',
             data: {
@@ -478,136 +453,82 @@
                 datasets: [{
                     label: 'Win Rate',
                     data: [
-                        {{(team_stats.wins / (team_stats.wins + team_stats.losses + team_stats.draws)) * 100
-                }
+                        {{ win_rate }},
+                        {{ 100 - win_rate }}
+                    ],
+                    backgroundColor: [
+                        'rgba(26, 75, 140, 0.8)',
+                        'rgba(236, 236, 236, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(26, 75, 140, 1)',
+                        'rgba(236, 236, 236, 1)'
+                    ],
+                    borderWidth: 1
+                }]
             },
-        {
-            {
-                100 - ((team_stats.wins / (team_stats.wins + team_stats.losses + team_stats.draws)) * 100)
-            }
-        }
-    ],
-        backgroundColor: [
-            'rgba(26, 75, 140, 0.8)',
-            'rgba(236, 236, 236, 0.8)'
-        ],
-            borderColor
-    :
-        [
-            'rgba(26, 75, 140, 1)',
-            'rgba(236, 236, 236, 1)'
-        ],
-            borderWidth
-    :
-        1
-    }]
-    },
-        options: {
-            responsive: true,
-                maintainAspectRatio
-        :
-            false,
-                cutout
-        :
-            '70%',
-                plugins
-        :
-            {
-                legend: {
-                    display: false
-                }
-            ,
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return context.label + ': ' + Math.round(context.raw) + '%';
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.label + ': ' + Math.round(context.raw) + '%';
+                            }
                         }
                     }
                 }
             }
-        }
-    })
-        ;
-        {%
-            endif %
-        }
+        });
+        {% endif %}
 
-        {%
-            if top_scorers %
-        }
+        {% if top_scorers %}
         // Top Scorers Chart
         var topScorersCtx = document.getElementById('topScorersChart').getContext('2d');
         var topScorersChart = new Chart(topScorersCtx, {
             type: 'bar',
             data: {
                 labels: [
-                    { % for player, goals in top_scorers %
-            }
-            '{{ player.first_name }} {{ player.last_name }}'{
-        {
-            ","
-            if not loop.last
-        }
-    }
-        {%
-            endfor %
-        }
-    ],
-        datasets: [{
-            label: 'Goals',
-            data: [
-                { % for player, goals in top_scorers %
-        }
-            {{goals}
-    }
-        {
-            {
-                ","
-                if not loop.last
-            }
-        }
-        {%
-            endfor %
-        }
-    ],
-        backgroundColor: 'rgba(26, 75, 140, 0.8)',
-            borderColor
-    :
-        'rgba(26, 75, 140, 1)',
-            borderWidth
-    :
-        1
-    }]
-    },
-        options: {
-            responsive: true,
-                maintainAspectRatio
-        :
-            false,
-                plugins
-        :
-            {
-                legend: {
-                    display: false
-                }
-            }
-        ,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                        ticks
-                :
-                    {
-                        precision: 0
+                    {% for player, goals in top_scorers %}
+                        '{{ player.first_name }} {{ player.last_name }}'{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                datasets: [{
+                    label: 'Goals',
+                    data: [
+                        {% for player, goals in top_scorers %}
+                            {{ goals }}{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                    backgroundColor: 'rgba(26, 75, 140, 0.8)',
+                    borderColor: 'rgba(26, 75, 140, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
                     }
                 }
             }
-        }
-    })
-        ;
-        {%
-            endif %
-        }
+        });
+        {% endif %}
     });
 </script>
 {% endblock %}
