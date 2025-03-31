@@ -1,75 +1,99 @@
-"""
-Initialize the Flask application
-"""
-import os
-from datetime import timedelta
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_migrate import Migrate
-
-from app.config import config_dict
-
-# Initialize extensions
-db = SQLAlchemy()
-migrate = Migrate()
-login_manager = LoginManager()
-login_manager.login_view = "auth.login"
-login_manager.login_message_category = "info"
-login_manager.login_message = "Please log in to access this page."
+from app.config import Config
+from app.extensions import db, migrate, login_manager, bcrypt, mail
+import os
+import logging
+from logging.handlers import RotatingFileHandler
+from flask.cli import with_appcontext
+import click
 
 
-def create_app(config_name=None):
-    """
-    Application factory function
-
-    Args:
-        config_name (str): Configuration environment name
-
-    Returns:
-        Flask app instance
-    """
-    # Initialize the Flask application
+def create_app(config_class=Config):
     app = Flask(__name__)
 
-    # Get configuration
-    config_name = config_name or os.environ.get("FLASK_ENV", "default")
-    app.config.from_object(config_dict[config_name])
+    filters.init_app(app)
+    app.context_processor(utility_processor)
 
-    # Configure remember cookie
-    app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=30)
-    app.config["REMEMBER_COOKIE_SECURE"] = False  # Set to True in production with HTTPS
-    app.config["REMEMBER_COOKIE_HTTPONLY"] = True
-    app.config["REMEMBER_COOKIE_REFRESH_EACH_REQUEST"] = True
+    # Create initial admin user
+    def create_admin_user():
+        """Create initial admin user if none exists."""
+        from app.models.user import User
+        from app.extensions import db
 
-    # Initialize extensions with the app
+        # Check if any admin exists
+        admin_exists = User.query.filter_by(user_type='admin').first()
+        if admin_exists:
+            return
+
+        # Create admin user
+        admin = User(
+            username='admin',
+            email='admin@example.com',
+            first_name='Admin',
+            last_name='User',
+            user_type='admin'
+        )
+        admin.set_password('1234')  # This should be changed immediately
+
+        db.session.add(admin)
+        db.session.commit()
+
+        print('Created admin user: admin@example.com / admin123')
+        print('Please change this password immediately after first login')
+
+    app.config.from_object(config_class)
+
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    bcrypt.init_app(app)
+    mail.init_app(app)
+
+    # Configure login
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message_category = 'info'
+
+    # Ensure upload directory exists
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     # Register blueprints
-    from app.routes.main import main_bp
-    from app.routes.auth import auth_bp
-    from app.routes.todo import todo_bp
+    from app.auth.routes import auth
+    from app.admin.routes import admin
+    from app.players.routes import players
+    from app.events.routes import events
+    from app.statistics.routes import statistics
+    from app.trophies.routes import trophies
+    from app import filters
+    from app.errors import errors
 
-    app.register_blueprint(main_bp)
-    app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(todo_bp)
+    app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(admin, url_prefix='/admin')
+    app.register_blueprint(players, url_prefix='/players')
+    app.register_blueprint(events, url_prefix='/events')
+    app.register_blueprint(statistics, url_prefix='/statistics')
+    app.register_blueprint(trophies, url_prefix='/trophies')
+    app.register_blueprint(errors)
 
-    # Register error handlers
-    register_error_handlers(app)
+    # Main route
+    from flask import render_template
+
+    @app.route('/')
+    def index():
+        return render_template('index.html')
 
     return app
 
 
-def register_error_handlers(app):
-    """Register error handlers"""
-    from flask import render_template
+if not app.debug:
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    file_handler = RotatingFileHandler('logs/football_team_management.log', maxBytes=10240, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
 
-    @app.errorhandler(404)
-    def not_found_error(error):
-        return render_template("errors/404.html"), 404
-
-    @app.errorhandler(500)
-    def internal_error(error):
-        return render_template("errors/500.html"), 500
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Football Team Management startup')

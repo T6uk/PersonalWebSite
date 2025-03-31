@@ -1,50 +1,61 @@
-// Main JavaScript for Personal Website
-
-// Wait for document to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-dismiss alerts after 5 seconds
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(function(alert) {
-        setTimeout(function() {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        }, 5000);
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // Update navbar appearance on theme change
-    window.addEventListener('themechange', function(e) {
-        updateNavbarForTheme(e.detail.theme);
+    // Add active class to current nav item
+    var currentLocation = window.location.pathname;
+    var navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+
+    navLinks.forEach(function(link) {
+        var linkPath = link.getAttribute('href');
+        if (currentLocation === linkPath || currentLocation.startsWith(linkPath) && linkPath !== '/') {
+            link.classList.add('active');
+        }
     });
 
-    // Initialize navbar based on current theme
-    updateNavbarForTheme(document.documentElement.getAttribute('data-bs-theme'));
+    // File input custom text
+    document.querySelectorAll('.custom-file-input').forEach(function(input) {
+        input.addEventListener('change', function(e) {
+            var fileName = this.files[0].name;
+            var nextSibling = this.nextElementSibling;
+            nextSibling.innerText = fileName;
+        });
+    });
 
-    // Log initialization
-    console.log('Personal Website initialized');
+    // Confirmation for delete actions
+    document.querySelectorAll('.btn-delete').forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                e.preventDefault();
+            }
+        });
+    });
 });
 
-// Update navbar appearance based on theme
-function updateNavbarForTheme(theme) {
-    const navbar = document.querySelector('.navbar');
-    const footer = document.querySelector('footer');
+// Create context-specific functions for the templates
+function get_upcoming_events(limit) {
+    // In a real application, this would query the database
+    // For the template, we'll return an empty array
+    return [];
+}
 
-    if (!navbar) return;
+function get_latest_team_stats() {
+    // In a real application, this would query the database
+    // For the template, we'll return null
+    return null;
+}
 
-    if (theme === 'dark') {
-        navbar.classList.remove('navbar-dark', 'bg-dark');
-        navbar.classList.add('navbar-dark', 'bg-dark');
+function get_recent_trophies(limit) {
+    // In a real application, this would query the database
+    // For the template, we'll return an empty array
+    return [];
+}
 
-        if (footer) {
-            footer.classList.remove('bg-light', 'text-dark');
-            footer.classList.add('bg-dark', 'text-white');
-        }
-    } else {
-        navbar.classList.remove('navbar-dark', 'bg-dark');
-        navbar.classList.add('navbar-dark', 'bg-primary');
-
-        if (footer) {
-            footer.classList.remove('bg-dark', 'text-white');
-            footer.classList.add('bg-dark', 'text-white');
-        }
-    }
+function get_recent_events(limit) {
+    // In a real application, this would query the database
+    // For the template, we'll return an empty array
+    return [];
 }

@@ -1,10 +1,10 @@
-#!/usr/bin/env python
-"""
-Application entry point to run the Flask app
-"""
 from app import create_app
 
 app = create_app()
 
-if __name__ == "__main__":
-    app.run(debug=app.config["DEBUG"])
+with app.app_context():
+    db.create_all()
+    create_admin_user()
+
+if __name__ == '__main__':
+    app.run(debug=True)
