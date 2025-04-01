@@ -4,44 +4,98 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="mb-4">Admin Dashboard</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-tachometer-alt me-2"></i>FC Mara Admin Dashboard</h1>
+        <div>
+            <a href="{{ url_for('admin.create_player') }}" class="btn btn-success">
+                <i class="fas fa-user-plus me-1"></i> Add New Player
+            </a>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-users fa-3x mb-3 text-primary"></i>
-                    <h2 class="card-title">{{ player_count }}</h2>
-                    <p class="card-text">Total Players</p>
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <div class="stat-icon" style="background-color: var(--primary);">
+                        <i class="fas fa-users fa-lg"></i>
+                    </div>
+                    <div class="stat-value">{{ player_count }}</div>
+                    <div class="stat-label">Total Players</div>
                 </div>
                 <div class="card-footer">
-                    <a href="{{ url_for('admin.manage_players') }}" class="btn btn-primary btn-sm w-100">View Players</a>
+                    <a href="{{ url_for('admin.manage_players') }}" class="btn btn-primary w-100">
+                        <i class="fas fa-eye me-1"></i> View Players
+                    </a>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-user-plus fa-3x mb-3 text-success"></i>
-                    <h5 class="card-title">Add New Player</h5>
-                    <p class="card-text">Create a new player account</p>
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <div class="stat-icon" style="background-color: var(--secondary);">
+                        <i class="fas fa-user-plus fa-lg"></i>
+                    </div>
+                    <div class="stat-label">Add New Player</div>
+                    <p class="text-muted mt-2">Create a new FC Mara player account</p>
                 </div>
                 <div class="card-footer">
-                    <a href="{{ url_for('admin.create_player') }}" class="btn btn-success btn-sm w-100">Create Player</a>
+                    <a href="{{ url_for('admin.create_player') }}" class="btn btn-secondary w-100">
+                        <i class="fas fa-plus me-1"></i> Create Player
+                    </a>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-cog fa-3x mb-3 text-secondary"></i>
-                    <h5 class="card-title">Team Management</h5>
-                    <p class="card-text">Manage your team roster</p>
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <div class="stat-icon" style="background-color: var(--dark);">
+                        <i class="fas fa-cog fa-lg"></i>
+                    </div>
+                    <div class="stat-label">Team Management</div>
+                    <p class="text-muted mt-2">Manage FC Mara team roster</p>
                 </div>
                 <div class="card-footer">
-                    <a href="{{ url_for('admin.manage_players') }}" class="btn btn-secondary btn-sm w-100">Manage Team</a>
+                    <a href="{{ url_for('admin.manage_players') }}" class="btn btn-dark w-100">
+                        <i class="fas fa-tasks me-1"></i> Manage Team
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0"><i class="fas fa-shield-alt me-2"></i>FC Mara Team Overview</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 text-center">
+                            <div class="team-logo mb-3">
+                                <i class="fas fa-futbol"></i>
+                            </div>
+                            <h4>FC Mara</h4>
+                            <p class="text-muted">Team Management Portal</p>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="alert alert-info mb-0">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-info-circle fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="alert-heading">Welcome to the FC Mara Admin Dashboard</h5>
+                                        <p>From here you can manage your team, add new players, and oversee all team operations. Use the cards above to navigate to different management functions.</p>
+                                        <p class="mb-0">As the team administrator, you have full control over player accounts and team information.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

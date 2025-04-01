@@ -4,64 +4,122 @@
 
 {% block content %}
 <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-running me-2"></i>FC Mara Player Dashboard</h1>
+    </div>
+
     <div class="row">
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 mb-4">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Player Profile</h3>
+                    <h3 class="mb-0"><i class="fas fa-id-card me-2"></i>Player Profile</h3>
                 </div>
                 <div class="card-body">
                     <div class="text-center mb-4">
-                        <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                        <div class="profile-image">
+                            <i class="fas fa-user"></i>
+                        </div>
                         <h4>{{ current_user.username }}</h4>
                         <p class="text-muted">{{ current_user.email }}</p>
+                        {% if current_user.position %}
+                            <span class="badge bg-team-primary">{{ current_user.position }}</span>
+                        {% endif %}
+                        {% if current_user.jersey_number %}
+                            <span class="badge bg-team-secondary">#{{ current_user.jersey_number }}</span>
+                        {% endif %}
                     </div>
 
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><strong>Position:</strong></span>
-                            <span>{{ current_user.position or 'Not specified' }}</span>
+                            <span><i class="fas fa-running me-2"></i><strong>Position:</strong></span>
+                            <span class="badge bg-light text-dark">{{ current_user.position or 'Not specified' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><strong>Jersey Number:</strong></span>
-                            <span>{{ current_user.jersey_number or 'Not assigned' }}</span>
+                            <span><i class="fas fa-tshirt me-2"></i><strong>Jersey Number:</strong></span>
+                            <span class="badge bg-light text-dark">{{ current_user.jersey_number or 'Not assigned' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><strong>Date of Birth:</strong></span>
-                            <span>{{ current_user.date_of_birth.strftime('%Y-%m-%d') if current_user.date_of_birth else 'Not specified' }}</span>
+                            <span><i class="fas fa-calendar-alt me-2"></i><strong>Date of Birth:</strong></span>
+                            <span class="badge bg-light text-dark">{{ current_user.date_of_birth.strftime('%Y-%m-%d') if current_user.date_of_birth else 'Not specified' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><strong>Height:</strong></span>
-                            <span>{{ current_user.height or 'Not specified' }} cm</span>
+                            <span><i class="fas fa-ruler-vertical me-2"></i><strong>Height:</strong></span>
+                            <span class="badge bg-light text-dark">{{ current_user.height or 'Not specified' }} cm</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><strong>Weight:</strong></span>
-                            <span>{{ current_user.weight or 'Not specified' }} kg</span>
+                            <span><i class="fas fa-weight me-2"></i><strong>Weight:</strong></span>
+                            <span class="badge bg-light text-dark">{{ current_user.weight or 'Not specified' }} kg</span>
                         </li>
                     </ul>
+                </div>
+                <div class="card-footer">
+                    <p class="text-center mb-0 text-muted">
+                        <small>FC Mara Player Since: {{ current_user.created_at.strftime('%Y-%m-%d') }}</small>
+                    </p>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-8 mb-4">
-            <div class="card">
+        <div class="col-lg-8 mb-4">
+            <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Welcome, {{ current_user.username }}!</h3>
+                    <h3 class="mb-0"><i class="fas fa-bullhorn me-2"></i>Team Updates</h3>
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Player Dashboard</h5>
-                    <p class="card-text">This is your player dashboard where you can view your information and team details.</p>
-
-                    {% if current_user.bio %}
-                        <div class="mt-4">
-                            <h5>Bio</h5>
-                            <p>{{ current_user.bio }}</p>
+                    <div class="alert alert-info">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-info-circle fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="alert-heading">Welcome to FC Mara, {{ current_user.username }}!</h5>
+                                <p>This is your player dashboard where you can view your information and team details. Check back regularly for updates from your coach.</p>
+                            </div>
                         </div>
-                    {% endif %}
+                    </div>
 
-                    <div class="alert alert-info mt-4">
-                        <h5 class="alert-heading">Team Updates</h5>
-                        <p>No current team updates. Check back later for announcements from your coach.</p>
+                    <div class="row mt-4">
+                        <div class="col-md-5 text-center mb-3 mb-md-0">
+                            <div class="team-logo">
+                                <i class="fas fa-futbol"></i>
+                            </div>
+                            <h4>FC Mara</h4>
+                            <p class="text-muted">Team Excellence</p>
+                        </div>
+                        <div class="col-md-7">
+                            {% if current_user.bio %}
+                                <h5><i class="fas fa-user-tag me-2"></i>Player Bio</h5>
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <p class="card-text">{{ current_user.bio }}</p>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-secondary">
+                                    <h5 class="alert-heading">No Player Bio</h5>
+                                    <p class="mb-0">Your bio information has not been added yet. Please contact your team administrator to update your profile.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-calendar me-2"></i>Upcoming FC Mara Events</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="alert-heading">No Upcoming Events</h5>
+                                <p>There are no scheduled events at this time. Check back later for upcoming practices and games.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
