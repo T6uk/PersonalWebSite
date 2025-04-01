@@ -1,0 +1,186 @@
+{% extends "layout.html" %}
+
+{% block title %}Create Event{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-calendar-plus me-2"></i>Add New FC Mara Event</h1>
+        <a href="{{ url_for('admin.manage_events') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Events
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h3 class="mb-0">Event Details</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+
+                <div class="row mb-4">
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+                        <div class="team-logo">
+                            <i class="fas fa-futbol"></i>
+                        </div>
+                        <h4>FC Mara</h4>
+                        <p class="text-muted">Team Event Registration</p>
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Fill out the form below to schedule a new event for FC Mara. All players will be able to view event details on their dashboard.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Basic Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ form.title.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-heading text-primary"></i></span>
+                                        {% if form.title.errors %}
+                                            {{ form.title(class="form-control is-invalid") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.title.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form.title(class="form-control", placeholder="e.g. League Match vs. FC Rivals") }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.event_type.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-tag text-primary"></i></span>
+                                        {% if form.event_type.errors %}
+                                            {{ form.event_type(class="form-select is-invalid") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.event_type.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form.event_type(class="form-select") }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.location.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-map-marker-alt text-primary"></i></span>
+                                        {% if form.location.errors %}
+                                            {{ form.location(class="form-control is-invalid", placeholder="e.g. City Stadium or Zoom Meeting") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.location.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form.location(class="form-control", placeholder="e.g. City Stadium or Zoom Meeting") }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Start Date/Time</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-0">
+                                    {{ form.start_datetime.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-clock text-primary"></i></span>
+                                        {% if form.start_datetime.errors %}
+                                            {{ form.start_datetime(class="form-control is-invalid", type="datetime-local") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.start_datetime.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form.start_datetime(class="form-control", type="datetime-local") }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">End Date/Time</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-0">
+                                    {{ form.end_datetime.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-clock text-primary"></i></span>
+                                        {% if form.end_datetime.errors %}
+                                            {{ form.end_datetime(class="form-control is-invalid", type="datetime-local") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.end_datetime.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form.end_datetime(class="form-control", type="datetime-local") }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Event Description</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-0">
+                            {{ form.description.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-file-alt text-primary"></i></span>
+                                {% if form.description.errors %}
+                                    {{ form.description(class="form-control is-invalid", rows=4, placeholder="Enter event details, notes, and any other important information.") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.description.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.description(class="form-control", rows=4, placeholder="Enter event details, notes, and any other important information.") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    {{ form.submit(class="btn btn-secondary btn-lg") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+
+{% block title %}Team Events{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-calendar-alt me-2"></i>FC Mara Team Events</h1>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Upcoming Events</h3>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_events %}
+                        <div class="list-group">
+                            {% for event in upcoming_events %}
+                                <a href="{{ url_for('player.view_event', event_id=event.id) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <div>
+                                            <div class="d-flex align-items-center">
+                                                {% if event.event_type == 'league_game' %}
+                                                    <i class="fas fa-trophy text-warning me-2"></i>
+                                                {% elif event.event_type == 'tournament' %}
+                                                    <i class="fas fa-medal text-primary me-2"></i>
+                                                {% elif event.event_type == 'friendly_match' %}
+                                                    <i class="fas fa-handshake text-success me-2"></i>
+                                                {% else %}
+                                                    <i class="fas fa-calendar-day text-secondary me-2"></i>
+                                                {% endif %}
+                                                <h5 class="mb-1">{{ event.title }}</h5>
+                                            </div>
+                                            <p class="mb-1">
+                                                {% if event.event_type == 'league_game' %}
+                                                    <span class="badge bg-warning">League Game</span>
+                                                {% elif event.event_type == 'tournament' %}
+                                                    <span class="badge bg-primary">Tournament</span>
+                                                {% elif event.event_type == 'friendly_match' %}
+                                                    <span class="badge bg-success">Friendly Match</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Custom Event</span>
+                                                {% endif %}
+                                                {% if event.location %}
+                                                    <span class="ms-2"><i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}</span>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>{{ event.start_datetime.strftime('%Y-%m-%d %H:%M') }}
+                                            </small>
+                                            <div>
+                                                {% set time_diff = event.start_datetime - now %}
+                                                {% if time_diff.days > 0 %}
+                                                    <span class="badge bg-team-primary">In {{ time_diff.days }} days</span>
+                                                {% elif time_diff.seconds // 3600 < 24 and time_diff.seconds // 3600 > 0 %}
+                                                    <span class="badge bg-warning">In {{ time_diff.seconds // 3600 }} hours</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Soon</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-info-circle fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h5 class="alert-heading">No Upcoming Events</h5>
+                                    <p class="mb-0">There are no scheduled events at this time. Check back later for upcoming matches and team activities.</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0"><i class="fas fa-history me-2"></i>Past Events</h3>
+                </div>
+                <div class="card-body">
+                    {% if past_events %}
+                        <div class="list-group">
+                            {% for event in past_events %}
+                                <a href="{{ url_for('player.view_event', event_id=event.id) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <div>
+                                            <div class="d-flex align-items-center">
+                                                {% if event.event_type == 'league_game' %}
+                                                    <i class="fas fa-trophy text-warning me-2"></i>
+                                                {% elif event.event_type == 'tournament' %}
+                                                    <i class="fas fa-medal text-primary me-2"></i>
+                                                {% elif event.event_type == 'friendly_match' %}
+                                                    <i class="fas fa-handshake text-success me-2"></i>
+                                                {% else %}
+                                                    <i class="fas fa-calendar-day text-secondary me-2"></i>
+                                                {% endif %}
+                                                <h5 class="mb-1">{{ event.title }}</h5>
+                                            </div>
+                                            <p class="mb-1">
+                                                {% if event.event_type == 'league_game' %}
+                                                    <span class="badge bg-warning">League Game</span>
+                                                {% elif event.event_type == 'tournament' %}
+                                                    <span class="badge bg-primary">Tournament</span>
+                                                {% elif event.event_type == 'friendly_match' %}
+                                                    <span class="badge bg-success">Friendly Match</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Custom Event</span>
+                                                {% endif %}
+                                                {% if event.location %}
+                                                    <span class="ms-2"><i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}</span>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>{{ event.start_datetime.strftime('%Y-%m-%d %H:%M') }}
+                                            </small>
+                                            <div>
+                                                <span class="badge bg-secondary">Completed</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-secondary mb-0">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-info-circle fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h5 class="alert-heading">No Past Events</h5>
+                                    <p class="mb-0">There are no past events in the team history yet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

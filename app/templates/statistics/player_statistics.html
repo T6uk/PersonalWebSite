@@ -1,0 +1,316 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ player.username }} Statistics{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a href="{{ url_for('admin.manage_players') }}" class="btn btn-sm btn-outline-primary mb-2">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Players
+                </a>
+                <h1><i class="fas fa-chart-bar me-2"></i>{{ player.username }}'s Statistics</h1>
+            </div>
+            <div>
+            <span class="badge bg-primary p-2">
+                <i class="fas fa-calendar me-1"></i> {{ current_season }} Season
+            </span>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="fas fa-id-card me-2"></i>Player Profile</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <div class="profile-image">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4>{{ player.username }}</h4>
+                            <p class="text-muted">{{ player.email }}</p>
+                            {% if player.position %}
+                                <span class="badge bg-team-primary">{{ player.position }}</span>
+                            {% endif %}
+                            {% if player.jersey_number %}
+                                <span class="badge bg-team-secondary">#{{ player.jersey_number }}</span>
+                            {% endif %}
+                        </div>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-running me-2"></i><strong>Position:</strong></span>
+                                <span class="badge bg-light text-dark">{{ player.position or 'Not specified' }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-tshirt me-2"></i><strong>Jersey Number:</strong></span>
+                                <span class="badge bg-light text-dark">{{ player.jersey_number or 'Not assigned' }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-calendar-alt me-2"></i><strong>Date of Birth:</strong></span>
+                                <span class="badge bg-light text-dark">{{ player.date_of_birth.strftime('%Y-%m-%d') if player.date_of_birth else 'Not specified' }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-ruler-vertical me-2"></i><strong>Height:</strong></span>
+                                <span class="badge bg-light text-dark">{{ player.height or 'Not specified' }} cm</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-weight me-2"></i><strong>Weight:</strong></span>
+                                <span class="badge bg-light text-dark">{{ player.weight or 'Not specified' }} kg</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="fas fa-trophy me-2"></i>Season Performance</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if season_stats %}
+                            <div class="row text-center mt-2">
+                                <div class="col-md-3 mb-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h1 class="display-4 text-primary">{{ season_stats.matches_played or 0 }}</h1>
+                                            <p class="text-muted">Matches Played</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h1 class="display-4 text-success">{{ season_stats.total_goals or 0 }}</h1>
+                                            <p class="text-muted">Goals</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h1 class="display-4 text-info">{{ season_stats.total_assists or 0 }}</h1>
+                                            <p class="text-muted">Assists</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h1 class="display-4 text-warning">{{ '%.1f'|format(season_stats.avg_rating or 0) }}</h1>
+                                            <p class="text-muted">Avg Rating</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header bg-light">
+                                            <h5 class="mb-0">Performance by Competition</h5>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped mb-0">
+                                                    <thead class="table-dark">
+                                                    <tr>
+                                                        <th>Competition</th>
+                                                        <th class="text-center">Matches</th>
+                                                        <th class="text-center">Minutes</th>
+                                                        <th class="text-center">Goals</th>
+                                                        <th class="text-center">Assists</th>
+                                                        <th class="text-center">YC</th>
+                                                        <th class="text-center">RC</th>
+                                                        <th class="text-center">Rating</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <i class="fas fa-trophy text-warning me-2"></i>League Games
+                                                        </td>
+                                                        <td class="text-center">{{ league_stats.matches_played or 0 }}</td>
+                                                        <td class="text-center">{{ league_stats.total_minutes or 0 }}</td>
+                                                        <td class="text-center">{{ league_stats.total_goals or 0 }}</td>
+                                                        <td class="text-center">{{ league_stats.total_assists or 0 }}</td>
+                                                        <td class="text-center">{{ league_stats.total_yellows or 0 }}</td>
+                                                        <td class="text-center">{{ league_stats.total_reds or 0 }}</td>
+                                                        <td class="text-center">{{ '%.1f'|format(league_stats.avg_rating or 0) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <i class="fas fa-medal text-primary me-2"></i>Tournaments
+                                                        </td>
+                                                        <td class="text-center">{{ tournament_stats.matches_played or 0 }}</td>
+                                                        <td class="text-center">{{ tournament_stats.total_minutes or 0 }}</td>
+                                                        <td class="text-center">{{ tournament_stats.total_goals or 0 }}</td>
+                                                        <td class="text-center">{{ tournament_stats.total_assists or 0 }}</td>
+                                                        <td class="text-center">{{ tournament_stats.total_yellows or 0 }}</td>
+                                                        <td class="text-center">{{ tournament_stats.total_reds or 0 }}</td>
+                                                        <td class="text-center">{{ '%.1f'|format(tournament_stats.avg_rating or 0) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <i class="fas fa-handshake text-success me-2"></i>Friendly
+                                                            Matches
+                                                        </td>
+                                                        <td class="text-center">{{ friendly_stats.matches_played or 0 }}</td>
+                                                        <td class="text-center">{{ friendly_stats.total_minutes or 0 }}</td>
+                                                        <td class="text-center">{{ friendly_stats.total_goals or 0 }}</td>
+                                                        <td class="text-center">{{ friendly_stats.total_assists or 0 }}</td>
+                                                        <td class="text-center">{{ friendly_stats.total_yellows or 0 }}</td>
+                                                        <td class="text-center">{{ friendly_stats.total_reds or 0 }}</td>
+                                                        <td class="text-center">{{ '%.1f'|format(friendly_stats.avg_rating or 0) }}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                    <tfoot class="table-primary">
+                                                    <tr>
+                                                        <td><strong>Total</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.matches_played or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.total_minutes or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.total_goals or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.total_assists or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.total_yellows or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.total_reds or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ '%.1f'|format(season_stats.avg_rating or 0) }}</strong>
+                                                        </td>
+                                                    </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info my-3">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-info-circle fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="alert-heading">No Statistics Available</h5>
+                                        <p class="mb-0">There are no performance statistics available
+                                            for {{ player.username }} this season. Add match performances for this
+                                            player to
+                                            see statistics here.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="fas fa-history me-2"></i>Recent Performances</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if recent_performances %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover mb-0">
+                                    <thead class="table-dark">
+                                    <tr>
+                                        <th>Match</th>
+                                        <th class="text-center">Date</th>
+                                        <th class="text-center">Goals</th>
+                                        <th class="text-center">Assists</th>
+                                        <th class="text-center">Minutes</th>
+                                        <th class="text-center">Cards</th>
+                                        <th class="text-center">Rating</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for performance in recent_performances %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    {% if performance.match.event.event_type == 'league_game' %}
+                                                        <i class="fas fa-trophy text-warning me-2"></i>
+                                                    {% elif performance.match.event.event_type == 'tournament' %}
+                                                        <i class="fas fa-medal text-primary me-2"></i>
+                                                    {% elif performance.match.event.event_type == 'friendly_match' %}
+                                                        <i class="fas fa-handshake text-success me-2"></i>
+                                                    {% endif %}
+                                                    <div>
+                                                        <span>{{ performance.match.home_team }} {{ performance.match.home_score }}-{{ performance.match.away_score }} {{ performance.match.away_team }}</span>
+                                                        <small class="d-block text-muted">{{ performance.match.event.title }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">{{ performance.match.match_date.strftime('%Y-%m-%d') }}</td>
+                                            <td class="text-center">
+                                                {% if performance.goals > 0 %}
+                                                    <span class="badge bg-success">{{ performance.goals }}</span>
+                                                {% else %}
+                                                    <span>0</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">
+                                                {% if performance.assists > 0 %}
+                                                    <span class="badge bg-success">{{ performance.assists }}</span>
+                                                {% else %}
+                                                    <span>0</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">{{ performance.minutes_played }}</td>
+                                            <td class="text-center">
+                                                {% if performance.yellow_cards > 0 %}
+                                                    <span class="badge bg-warning">{{ performance.yellow_cards }}</span>
+                                                {% endif %}
+                                                {% if performance.red_cards > 0 %}
+                                                    <span class="badge bg-danger">{{ performance.red_cards }}</span>
+                                                {% endif %}
+
+                                                {% if performance.yellow_cards == 0 and performance.red_cards == 0 %}
+                                                    <span>-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">
+                                                {% if performance.rating >= 8.0 %}
+                                                    <span class="badge bg-success">{{ performance.rating }}</span>
+                                                {% elif performance.rating >= 6.0 %}
+                                                    <span class="badge bg-primary">{{ performance.rating }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ performance.rating }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info m-3">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-info-circle fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="alert-heading">No Recent Performances</h5>
+                                        <p class="mb-0">There are no recent performance records for this player.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

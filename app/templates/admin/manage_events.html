@@ -1,0 +1,183 @@
+{% extends "layout.html" %}
+
+{% block title %}Manage Events{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-calendar-alt me-2"></i>Manage FC Mara Events</h1>
+        <a href="{{ url_for('admin.create_event') }}" class="btn btn-secondary">
+            <i class="fas fa-plus me-1"></i> Add New Event
+        </a>
+    </div>
+
+    {% if events %}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="fas fa-calendar-check me-2"></i>FC Mara Event Schedule</h3>
+                <span class="badge bg-primary">{{ events|length }} Events</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Event</th>
+                                <th>Type</th>
+                                <th>Location</th>
+                                <th>Date & Time</th>
+                                <th>Statistics</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                                <tr>
+                                    <td>{{ event.id }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                {% if event.event_type == 'league_game' %}
+                                                    <i class="fas fa-trophy text-warning fa-lg"></i>
+                                                {% elif event.event_type == 'tournament' %}
+                                                    <i class="fas fa-medal text-primary fa-lg"></i>
+                                                {% elif event.event_type == 'friendly_match' %}
+                                                    <i class="fas fa-handshake text-success fa-lg"></i>
+                                                {% else %}
+                                                    <i class="fas fa-calendar-day text-secondary fa-lg"></i>
+                                                {% endif %}
+                                            </div>
+                                            <strong>{{ event.title }}</strong>
+                                        </div>
+                                        {% if event.season %}
+                                            <small class="text-muted">Season: {{ event.season }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if event.event_type == 'league_game' %}
+                                            <span class="badge bg-warning">League Game</span>
+                                        {% elif event.event_type == 'tournament' %}
+                                            <span class="badge bg-primary">Tournament</span>
+                                        {% elif event.event_type == 'friendly_match' %}
+                                            <span class="badge bg-success">Friendly Match</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Custom Event</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ event.location or 'N/A' }}</td>
+                                    <td>
+                                        <div>
+                                            <small class="text-muted">Start: </small>
+                                            {{ event.start_datetime.strftime('%Y-%m-%d %H:%M') }}
+                                        </div>
+                                        <div>
+                                            <small class="text-muted">End: </small>
+                                            {{ event.end_datetime.strftime('%Y-%m-%d %H:%M') }}
+                                        </div>
+                                        <div>
+                                            {% if event.start_datetime > current_date %}
+                                                <span class="badge bg-info">Upcoming</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Past</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if event.event_type in ['league_game', 'friendly_match', 'tournament'] %}
+                                            {% if event.has_statistics %}
+                                                <a href="{{ url_for('admin_stats.event_statistics', event_id=event.id) }}" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-chart-bar me-1"></i> View Stats
+                                                </a>
+                                                <div>
+                                                    <small class="text-muted">Updated: {{ event.statistics_last_updated.strftime('%Y-%m-%d') }}</small>
+                                                </div>
+                                            {% else %}
+                                                <a href="{{ url_for('admin_stats.event_statistics', event_id=event.id) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-plus me-1"></i> Add Stats
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('admin.edit_event', event_id=event.id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ event.id }}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Delete Confirmation Modal -->
+                                        <div class="modal fade" id="deleteModal{{ event.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ event.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-danger text-white">
+                                                        <h5 class="modal-title" id="deleteModalLabel{{ event.id }}">
+                                                            <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to delete the event "<strong>{{ event.title }}</strong>"?</p>
+                                                        {% if event.has_statistics %}
+                                                            <div class="alert alert-warning">
+                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                <strong>Warning:</strong> This event has statistics associated with it. Deleting this event will also delete all statistics records linked to it.
+                                                            </div>
+                                                        {% endif %}
+                                                        <p class="mb-0 text-danger"><small>This action cannot be undone.</small></p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                            <i class="fas fa-times me-1"></i>Cancel
+                                                        </button>
+                                                        <form action="{{ url_for('admin.delete_event', event_id=event.id) }}" method="POST">
+                                                            <button type="submit" class="btn btn-danger">
+                                                                <i class="fas fa-trash-alt me-1"></i>Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+                        <div class="team-logo">
+                            <i class="fas fa-futbol"></i>
+                        </div>
+                        <h4>FC Mara</h4>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="alert alert-info mb-0">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-info-circle fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h4 class="alert-heading">No Events Found!</h4>
+                                    <p class="mb-0">Your FC Mara event schedule is empty. Click the button above to add your first event.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

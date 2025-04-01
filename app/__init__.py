@@ -20,6 +20,8 @@ def create_app(config_class=Config):
 
     # Import models (must be after db initialization but before create_all)
     from .models.User import User
+    from .models.Event import Event
+    from .models.Statistics import MatchStatistic, PlayerPerformance, TournamentStatistic, TournamentMatch
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -29,11 +31,13 @@ def create_app(config_class=Config):
     from .views.main import main
     from .views.auth import auth
     from .views.admin import admin
+    from .views.admin_statistics import admin_stats
     from .views.player import player
 
     app.register_blueprint(main)
     app.register_blueprint(auth)
     app.register_blueprint(admin)
+    app.register_blueprint(admin_stats)
     app.register_blueprint(player)
 
     # Create database

@@ -1,0 +1,211 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="{{ url_for('player.view_events') }}" class="btn btn-sm btn-outline-primary mb-2">
+                <i class="fas fa-arrow-left me-1"></i> Back to Events
+            </a>
+            <h1>
+                {% if event.event_type == 'league_game' %}
+                    <i class="fas fa-trophy text-warning me-2"></i>
+                {% elif event.event_type == 'tournament' %}
+                    <i class="fas fa-medal text-primary me-2"></i>
+                {% elif event.event_type == 'friendly_match' %}
+                    <i class="fas fa-handshake text-success me-2"></i>
+                {% else %}
+                    <i class="fas fa-calendar-day text-secondary me-2"></i>
+                {% endif %}
+                {{ event.title }}
+            </h1>
+        </div>
+        <div>
+            {% if event.start_datetime > now %}
+                {% set time_diff = event.start_datetime - now %}
+                {% if time_diff.days > 0 %}
+                    <span class="badge bg-team-primary">In {{ time_diff.days }} days</span>
+                {% elif time_diff.seconds // 3600 < 24 and time_diff.seconds // 3600 > 0 %}
+                    <span class="badge bg-warning">In {{ time_diff.seconds // 3600 }} hours</span>
+                {% else %}
+                    <span class="badge bg-danger">Soon</span>
+                {% endif %}
+            {% else %}
+                <span class="badge bg-secondary">Completed</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>Event Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h4>Description</h4>
+                        {% if event.description %}
+                            <p>{{ event.description }}</p>
+                        {% else %}
+                            <p class="text-muted">No description available.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0"><i class="fas fa-tag me-2"></i>Event Type</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if event.event_type == 'league_game' %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-trophy fa-2x text-warning"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-1">League Game</h5>
+                                                <p class="mb-0 text-muted">Official league competition match</p>
+                                            </div>
+                                        </div>
+                                    {% elif event.event_type == 'tournament' %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-medal fa-2x text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-1">Tournament</h5>
+                                                <p class="mb-0 text-muted">Series of matches in a competition</p>
+                                            </div>
+                                        </div>
+                                    {% elif event.event_type == 'friendly_match' %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-handshake fa-2x text-success"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-1">Friendly Match</h5>
+                                                <p class="mb-0 text-muted">Non-competitive exhibition game</p>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-calendar-day fa-2x text-secondary"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-1">Custom Event</h5>
+                                                <p class="mb-0 text-muted">Team activity or special event</p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Location</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if event.location %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-map-marked-alt fa-2x text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-1">{{ event.location }}</h5>
+                                                {% if event.start_datetime > now %}
+                                                    <a href="https://maps.google.com/?q={{ event.location|urlencode }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                                        <i class="fas fa-directions me-1"></i>Get Directions
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted">No location specified</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-clock me-2"></i>Schedule</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h5><i class="fas fa-calendar-alt me-2"></i>Start</h5>
+                        <p class="mb-1">{{ event.start_datetime.strftime('%A, %B %d, %Y') }}</p>
+                        <p class="mb-0">{{ event.start_datetime.strftime('%I:%M %p') }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5><i class="fas fa-calendar-check me-2"></i>End</h5>
+                        <p class="mb-1">{{ event.end_datetime.strftime('%A, %B %d, %Y') }}</p>
+                        <p class="mb-0">{{ event.end_datetime.strftime('%I:%M %p') }}</p>
+                    </div>
+
+                    <div class="mb-0">
+                        <h5><i class="fas fa-hourglass-half me-2"></i>Duration</h5>
+                        {% set duration = event.end_datetime - event.start_datetime %}
+                        {% set hours = duration.seconds // 3600 %}
+                        {% set minutes = (duration.seconds % 3600) // 60 %}
+                        <p class="mb-0">
+                            {% if duration.days > 0 %}
+                                {{ duration.days }} day{% if duration.days > 1 %}s{% endif %}
+                                {% if hours > 0 or minutes > 0 %}, {% endif %}
+                            {% endif %}
+                            {% if hours > 0 %}
+                                {{ hours }} hour{% if hours > 1 %}s{% endif %}
+                                {% if minutes > 0 %}, {% endif %}
+                            {% endif %}
+                            {% if minutes > 0 or (hours == 0 and duration.days == 0) %}
+                                {{ minutes }} minute{% if minutes != 1 %}s{% endif %}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0"><i class="fas fa-info me-2"></i>Additional Info</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="team-logo">
+                            <i class="fas fa-futbol"></i>
+                        </div>
+                        <h4>FC Mara</h4>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <div class="d-flex">
+                            <div class="me-2">
+                                <i class="fas fa-lightbulb fa-lg"></i>
+                            </div>
+                            <div>
+                                <h5 class="alert-heading">Event Reminder</h5>
+                                <p class="mb-0">Please arrive 30 minutes before the scheduled start time for proper preparation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <small>Created at: {{ event.created_at.strftime('%Y-%m-%d') }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
