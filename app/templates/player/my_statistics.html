@@ -3,69 +3,110 @@
 {% block title %}My Statistics{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="fas fa-chart-bar me-2"></i>My Performance Statistics</h1>
-        <div>
-            <span class="badge bg-primary p-2">
-                <i class="fas fa-calendar me-1"></i> {{ current_season }} Season
-            </span>
-        </div>
-    </div>
-
-    <div class="row mb-4">
-        {% if season_stats %}
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="mb-0"><i class="fas fa-trophy me-2"></i>Season Overview</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-md-3 mb-4">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h1 class="display-4 text-primary">{{ season_stats.matches_played or 0 }}</h1>
-                                        <p class="text-muted">Matches Played</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-4">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h1 class="display-4 text-success">{{ season_stats.total_goals or 0 }}</h1>
-                                        <p class="text-muted">Goals</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-4">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h1 class="display-4 text-info">{{ season_stats.total_assists or 0 }}</h1>
-                                        <p class="text-muted">Assists</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-4">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h1 class="display-4 text-warning">{{ '%.1f'|format(season_stats.avg_rating or 0) }}</h1>
-                                        <p class="text-muted">Avg Rating</p>
-                                    </div>
-                                </div>
+    <div class="container">
+        <div class="row mb-4">
+            {% if season_stats %}
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0">
+                                {% if competition_filter == 'all' %}
+                                    <i class="fas fa-trophy me-2"></i>Season Overview
+                                {% elif competition_filter == 'league_game' %}
+                                    <i class="fas fa-trophy me-2"></i>League Games Overview
+                                {% elif competition_filter == 'tournament' %}
+                                    <i class="fas fa-medal me-2"></i>Tournaments Overview
+                                {% elif competition_filter == 'friendly_match' %}
+                                    <i class="fas fa-handshake me-2"></i>Friendly Matches Overview
+                                {% endif %}
+                            </h3>
+                            <div>
+                                <small class="text-white">
+                                    {% if competition_filter == 'all' %}
+                                        Showing all competitions
+                                    {% elif competition_filter == 'league_game' %}
+                                        Filtered by league games
+                                    {% elif competition_filter == 'tournament' %}
+                                        Filtered by tournaments
+                                    {% elif competition_filter == 'friendly_match' %}
+                                        Filtered by friendly matches
+                                    {% endif %}
+                                </small>
                             </div>
                         </div>
-
-                        <div class="row mt-2">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-header bg-light">
-                                        <h5 class="mb-0">Performance by Competition</h5>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <div class="btn-group" role="group" aria-label="Competition filter">
+                                        <a href="{{ url_for('player.my_statistics', competition='all') }}"
+                                           class="btn btn-outline-primary {% if competition_filter == 'all' %}active{% endif %}">
+                                            <i class="fas fa-globe me-1"></i> All
+                                        </a>
+                                        <a href="{{ url_for('player.my_statistics', competition='league_game') }}"
+                                           class="btn btn-outline-warning {% if competition_filter == 'league_game' %}active{% endif %}">
+                                            <i class="fas fa-trophy me-1"></i> League
+                                        </a>
+                                        <a href="{{ url_for('player.my_statistics', competition='tournament') }}"
+                                           class="btn btn-outline-primary {% if competition_filter == 'tournament' %}active{% endif %}">
+                                            <i class="fas fa-medal me-1"></i> Tournament
+                                        </a>
+                                        <a href="{{ url_for('player.my_statistics', competition='friendly_match') }}"
+                                           class="btn btn-outline-success {% if competition_filter == 'friendly_match' %}active{% endif %}">
+                                            <i class="fas fa-handshake me-1"></i> Friendly
+                                        </a>
                                     </div>
-                                    <div class="card-body p-0">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped mb-0">
-                                                <thead class="table-dark">
+                                </div>
+                                <span class="badge bg-primary p-2">
+                                    <i class="fas fa-calendar me-1"></i> {{ current_season }} Season
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3 mb-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h1 class="display-4 text-primary">{{ season_stats.matches_played or 0 }}</h1>
+                                            <p class="text-muted">Matches Played</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h1 class="display-4 text-success">{{ season_stats.total_goals or 0 }}</h1>
+                                            <p class="text-muted">Goals</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h1 class="display-4 text-info">{{ season_stats.total_assists or 0 }}</h1>
+                                            <p class="text-muted">Assists</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h1 class="display-4 text-warning">{{ '%.1f'|format(season_stats.avg_rating or 0) }}</h1>
+                                            <p class="text-muted">Avg Rating</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header bg-light">
+                                            <h5 class="mb-0">Performance by Competition</h5>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped mb-0">
+                                                    <thead class="table-dark">
                                                     <tr>
                                                         <th>Competition</th>
                                                         <th class="text-center">Matches</th>
@@ -76,8 +117,8 @@
                                                         <th class="text-center">RC</th>
                                                         <th class="text-center">Rating</th>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
+                                                    </thead>
+                                                    <tbody>
                                                     <tr>
                                                         <td>
                                                             <i class="fas fa-trophy text-warning me-2"></i>League Games
@@ -104,7 +145,8 @@
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <i class="fas fa-handshake text-success me-2"></i>Friendly Matches
+                                                            <i class="fas fa-handshake text-success me-2"></i>Friendly
+                                                            Matches
                                                         </td>
                                                         <td class="text-center">{{ friendly_stats.matches_played or 0 }}</td>
                                                         <td class="text-center">{{ friendly_stats.total_minutes or 0 }}</td>
@@ -114,20 +156,29 @@
                                                         <td class="text-center">{{ friendly_stats.total_reds or 0 }}</td>
                                                         <td class="text-center">{{ '%.1f'|format(friendly_stats.avg_rating or 0) }}</td>
                                                     </tr>
-                                                </tbody>
-                                                <tfoot class="table-primary">
+                                                    </tbody>
+                                                    <tfoot class="table-primary">
                                                     <tr>
                                                         <td><strong>Total</strong></td>
-                                                        <td class="text-center"><strong>{{ season_stats.matches_played or 0 }}</strong></td>
-                                                        <td class="text-center"><strong>{{ season_stats.total_minutes or 0 }}</strong></td>
-                                                        <td class="text-center"><strong>{{ season_stats.total_goals or 0 }}</strong></td>
-                                                        <td class="text-center"><strong>{{ season_stats.total_assists or 0 }}</strong></td>
-                                                        <td class="text-center"><strong>{{ season_stats.total_yellows or 0 }}</strong></td>
-                                                        <td class="text-center"><strong>{{ season_stats.total_reds or 0 }}</strong></td>
-                                                        <td class="text-center"><strong>{{ '%.1f'|format(season_stats.avg_rating or 0) }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.matches_played or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.total_minutes or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.total_goals or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.total_assists or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.total_yellows or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ season_stats.total_reds or 0 }}</strong></td>
+                                                        <td class="text-center">
+                                                            <strong>{{ '%.1f'|format(season_stats.avg_rating or 0) }}</strong>
+                                                        </td>
                                                     </tr>
-                                                </tfoot>
-                                            </table>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -135,39 +186,40 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        {% else %}
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="alert alert-info mb-0">
-                            <div class="d-flex">
-                                <div class="me-3">
-                                    <i class="fas fa-info-circle fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h5 class="alert-heading">No Statistics Available</h5>
-                                    <p class="mb-0">You don't have any performance statistics recorded for the current season. After you play in matches and the coach records your performance, your statistics will appear here.</p>
+            {% else %}
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="alert alert-info mb-0">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-info-circle fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="alert-heading">No Statistics Available</h5>
+                                        <p class="mb-0">You don't have any performance statistics recorded for the
+                                            current season. After you play in matches and the coach records your
+                                            performance, your statistics will appear here.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        {% endif %}
-    </div>
+            {% endif %}
+        </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0"><i class="fas fa-history me-2"></i>Recent Performances</h3>
-                </div>
-                <div class="card-body p-0">
-                    {% if recent_performances %}
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover mb-0">
-                                <thead class="table-dark">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="fas fa-history me-2"></i>Recent Performances</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if recent_performances %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover mb-0">
+                                    <thead class="table-dark">
                                     <tr>
                                         <th>Match</th>
                                         <th class="text-center">Date</th>
@@ -177,8 +229,8 @@
                                         <th class="text-center">Cards</th>
                                         <th class="text-center">Rating</th>
                                     </tr>
-                                </thead>
-                                <tbody>
+                                    </thead>
+                                    <tbody>
                                     {% for performance in recent_performances %}
                                         <tr>
                                             <td>
@@ -235,25 +287,25 @@
                                             </td>
                                         </tr>
                                     {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info m-3">
-                            <div class="d-flex">
-                                <div class="me-3">
-                                    <i class="fas fa-info-circle fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h5 class="alert-heading">No Recent Performances</h5>
-                                    <p class="mb-0">There are no recent performance records for you.</p>
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info m-3">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-info-circle fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="alert-heading">No Recent Performances</h5>
+                                        <p class="mb-0">There are no recent performance records for you.</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

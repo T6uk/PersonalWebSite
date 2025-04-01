@@ -1,5 +1,5 @@
 # app/views/player.py
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from ..models.Event import Event
 from datetime import datetime
@@ -97,28 +97,42 @@ def view_event(event_id):
                            player_stats=player_stats)
 
 
+# In app/views/player.py - update the my_statistics function
 @player.route('/my-statistics')
 @login_required
 @player_required
 def my_statistics():
+    # Get filter from query parameters
+    competition_filter = request.args.get('competition', 'all')
+
     # Get current season for statistics
     current_year = datetime.utcnow().year
     current_month = datetime.utcnow().month
-    if current_month >= 8:  # If after August, use current season format (e.g., 2024-2025)
+    if current_month >= 8:  # If after August, use current season format
         current_season = f"{current_year}-{current_year + 1}"
     else:  # If before August, use previous season format
         current_season = f"{current_year - 1}-{current_year}"
 
-    # Get player's season stats
-    season_stats = current_user.get_season_statistics(season=current_season)
+    # Get player's season stats based on filter
+    if competition_filter == 'all':
+        season_stats = current_user.get_season_statistics(season=current_season)
+    elif competition_filter in ['league_game', 'tournament', 'friendly_match']:
+        season_stats = current_user.get_event_type_statistics(competition_filter, season=current_season)
+    else:
+        season_stats = current_user.get_season_statistics(season=current_season)
 
-    # Get statistics by event type
+    # Always get statistics by event type for the comparison table
     league_stats = current_user.get_event_type_statistics('league_game', season=current_season)
     friendly_stats = current_user.get_event_type_statistics('friendly_match', season=current_season)
     tournament_stats = current_user.get_event_type_statistics('tournament', season=current_season)
 
-    # Get recent performances
-    recent_performances = current_user.get_recent_performances(limit=10)
+    # Get recent performances with optional filter
+    if competition_filter == 'all':
+        recent_performances = current_user.get_recent_performances(limit=10)
+    elif competition_filter in ['league_game', 'tournament', 'friendly_match']:
+        recent_performances = current_user.get_recent_performances_by_type(competition_filter, limit=10)
+    else:
+        recent_performances = current_user.get_recent_performances(limit=10)
 
     return render_template('player/my_statistics.html',
                            title='My Statistics',
@@ -127,4 +141,5 @@ def my_statistics():
                            league_stats=league_stats,
                            friendly_stats=friendly_stats,
                            tournament_stats=tournament_stats,
-                           recent_performances=recent_performances)
+                           recent_performances=recent_performances,
+                           competition_filter=competition_filter)

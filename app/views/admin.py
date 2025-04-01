@@ -141,13 +141,26 @@ def create_event():
     # Set season choices dynamically
     current_year = datetime.utcnow().year
     next_year = current_year + 1
+    # Determine current season based on month
+    current_month = datetime.utcnow().month
+    if current_month >= 8:  # If after August, use current season format
+        default_season = f"{current_year}-{next_year}"
+    else:  # If before August, use previous season format
+        default_season = f"{current_year - 1}-{current_year}"
+
     form.season.choices = [
         ('', 'Select Season'),
         (f"{current_year - 1}-{current_year}", f"{current_year - 1}-{current_year}"),
         (f"{current_year}-{next_year}", f"{current_year}-{next_year}")
     ]
 
+    if request.method == 'GET':
+        form.season.data = default_season
+
     if form.validate_on_submit():
+        # Use form season or default if not provided
+        season = form.season.data if form.season.data else default_season
+
         event = Event(
             title=form.title.data,
             description=form.description.data,
@@ -156,7 +169,7 @@ def create_event():
             start_datetime=form.start_datetime.data,
             end_datetime=form.end_datetime.data,
             created_by_id=current_user.id,
-            season=form.season.data if form.season.data else None
+            season=season
         )
         db.session.add(event)
         db.session.commit()

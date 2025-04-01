@@ -37,6 +37,7 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}', '{self.email}', '{self.role}')"
 
     # Player statistics methods
+    # In app/models/User.py
     def get_season_statistics(self, season=None):
         """Get player statistics for a specific season"""
         from ..models.Statistics import PlayerPerformance, MatchStatistic
@@ -65,8 +66,24 @@ class User(db.Model, UserMixin):
 
         return query.first()
 
+    def get_recent_performances_by_type(self, event_type, limit=5):
+        """Get player's most recent performances filtered by event type"""
+        from ..models.Statistics import PlayerPerformance, MatchStatistic
+        from ..models.Event import Event
+
+        return PlayerPerformance.query.join(
+            MatchStatistic, MatchStatistic.id == PlayerPerformance.match_id
+        ).join(
+            Event, Event.id == MatchStatistic.event_id
+        ).filter(
+            PlayerPerformance.player_id == self.id,
+            Event.event_type == event_type
+        ).order_by(
+            MatchStatistic.match_date.desc()
+        ).limit(limit).all()
+
     def get_event_type_statistics(self, event_type, season=None):
-        """Get player statistics for a specific event type (league_game, friendly_match)"""
+        """Get player statistics for a specific event type (league_game, friendly_match, tournament)"""
         from ..models.Statistics import PlayerPerformance, MatchStatistic
         from ..models.Event import Event
 

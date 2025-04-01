@@ -167,7 +167,8 @@ def add_player_performance(match_id):
 
     # Get players for the dropdown
     players = User.query.filter_by(role='player').all()
-    form.player_id.choices = [(player.id, f"{player.username} (#{player.jersey_number})") for player in players]
+    form.player_id.choices = [(player.id, f"{player.username} (#{player.jersey_number or 'N/A'})") for player in
+                              players]
 
     if form.validate_on_submit():
         # Check if performance already exists for this player and match
@@ -207,6 +208,7 @@ def add_player_performance(match_id):
 
         # Update event statistics timestamp
         event.statistics_last_updated = datetime.utcnow()
+        event.has_statistics = True  # Ensure this is set to True
 
         db.session.commit()
         flash('Player performance has been added successfully!', 'success')
@@ -530,6 +532,43 @@ def delete_tournament_match(match_id):
 
     flash(f'Tournament match {match_info} has been deleted.', 'success')
     return redirect(url_for('admin_stats.event_statistics', event_id=event.id))
+
+
+@admin_stats.route('/tournament/match/<int:match_id>/player_performance/add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_tournament_player_performance(match_id):
+    tournament_match = TournamentMatch.query.get_or_404(match_id)
+    tournament_stats = TournamentStatistic.query.get_or_404(tournament_match.tournament_id)
+    event = Event.query.get_or_404(tournament_stats.event_id)
+
+    # Create a match statistic record for this tournament match if it doesn't exist
+    match_stat = MatchStatistic.query.filter_by(
+        event_id=event.id,
+        home_team=tournament_match.home_team,
+        away_team=tournament_match.away_team,
+        home_score=tournament_match.home_score,
+        away_score=tournament_match.away_score,
+        match_date=tournament_match.match_date
+    ).first()
+
+    if not match_stat:
+        match_stat = MatchStatistic(
+            event_id=event.id,
+            home_team=tournament_match.home_team,
+            away_team=tournament_match.away_team,
+            home_score=tournament_match.home_score,
+            away_score=tournament_match.away_score,
+            match_date=tournament_match.match_date,
+            location=tournament_match.location,
+            notes=tournament_match.notes,
+            created_by_id=current_user.id
+        )
+        db.session.add(match_stat)
+        db.session.commit()
+
+    # Now redirect to the regular player performance form using this match_stat
+    return redirect(url_for('admin_stats.add_player_performance', match_id=match_stat.id))
 
 
 @admin_stats.route('/player/<int:player_id>')

@@ -77,3 +77,16 @@ class TournamentMatchForm(FlaskForm):
     location = StringField('Location', validators=[Optional(), Length(max=100)])
     notes = TextAreaField('Match Notes', validators=[Optional(), Length(max=500)])
     submit = SubmitField('Save Tournament Match')
+
+
+class TournamentPlayerPerformanceForm(FlaskForm):
+    player_id = SelectField('Player', coerce=int, validators=[DataRequired()])
+    # Similar fields to the PlayerPerformanceForm but specific to tournament matches
+    minutes_played = IntegerField('Minutes Played', validators=[NumberRange(min=0, max=120)], default=0)
+    goals = IntegerField('Goals', validators=[NumberRange(min=0)], default=0)
+    assists = IntegerField('Assists', validators=[NumberRange(min=0)], default=0)
+    yellow_cards = IntegerField('Yellow Cards', validators=[NumberRange(min=0, max=2)], default=0)
+    red_cards = IntegerField('Red Cards', validators=[NumberRange(min=0, max=1)], default=0)
+    rating = FloatField('Player Rating (1-10)', validators=[NumberRange(min=1, max=10)], default=6.0)
+    notes = TextAreaField('Performance Notes', validators=[Optional(), Length(max=500)])
+    submit = SubmitField('Save Tournament Player Performance')
