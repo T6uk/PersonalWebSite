@@ -61,37 +61,98 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 {{ form.position.label(class="form-label") }}
-                                {{ form.position(class="form-select") }}
+                                {% if form.position.errors %}
+                                    {{ form.position(class="form-select is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.position.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.position(class="form-select") }}
+                                {% endif %}
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 {{ form.jersey_number.label(class="form-label") }}
-                                {{ form.jersey_number(class="form-control") }}
+                                {% if form.jersey_number.errors %}
+                                    {{ form.jersey_number(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.jersey_number.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.jersey_number(class="form-control") }}
+                                {% endif %}
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 {{ form.date_of_birth.label(class="form-label") }}
-                                {{ form.date_of_birth(class="form-control", type="date") }}
+                                {% if form.date_of_birth.errors %}
+                                    {{ form.date_of_birth(class="form-control is-invalid", type="date") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.date_of_birth.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.date_of_birth(class="form-control", type="date") }}
+                                {% endif %}
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 {{ form.height.label(class="form-label") }}
-                                {{ form.height(class="form-control") }}
+                                {% if form.height.errors %}
+                                    {{ form.height(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.height.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.height(class="form-control") }}
+                                {% endif %}
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 {{ form.weight.label(class="form-label") }}
-                                {{ form.weight(class="form-control") }}
+                                {% if form.weight.errors %}
+                                    {{ form.weight(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.weight.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.weight(class="form-control") }}
+                                {% endif %}
                             </div>
                         </div>
 
                         <div class="mb-3">
                             {{ form.bio.label(class="form-label") }}
-                            {{ form.bio(class="form-control", rows=4) }}
+                            {% if form.bio.errors %}
+                                {{ form.bio(class="form-control is-invalid", rows=4) }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.bio.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.bio(class="form-control", rows=4) }}
+                            {% endif %}
                         </div>
 
                         <div class="d-grid">
                             {{ form.submit(class="btn btn-success") }}
                         </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

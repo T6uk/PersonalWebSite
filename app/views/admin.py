@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField, TextAreaField, DateField, \
     FloatField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
-from ..models.user import User
+from ..models.User import User
 from ..extensions import db
 from datetime import datetime
 from functools import wraps

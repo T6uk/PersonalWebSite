@@ -19,7 +19,7 @@ def create_app(config_class=Config):
     login_manager.login_message_category = 'info'
 
     # Import models (must be after db initialization but before create_all)
-    from .models.user import User
+    from .models.User import User
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -48,7 +48,7 @@ def create_app(config_class=Config):
                 email='admin@example.com',
                 role='admin'
             )
-            admin_user.set_password('adminpassword')
+            admin_user.set_password('1234')
             db.session.add(admin_user)
             db.session.commit()
 
