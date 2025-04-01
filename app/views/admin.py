@@ -120,8 +120,16 @@ def delete_player(player_id):
 @login_required
 @admin_required
 def manage_events():
+    # Get all events with statistics status
     events = Event.query.order_by(Event.start_datetime).all()
-    return render_template('admin/manage_events.html', title='Manage Events', events=events)
+
+    # Get current date for comparison
+    current_date = datetime.utcnow()
+
+    return render_template('admin/manage_events.html',
+                           title='Manage Events',
+                           events=events,
+                           current_date=current_date)
 
 
 @admin.route('/events/create', methods=['GET', 'POST'])
@@ -129,6 +137,16 @@ def manage_events():
 @admin_required
 def create_event():
     form = EventForm()
+
+    # Set season choices dynamically
+    current_year = datetime.utcnow().year
+    next_year = current_year + 1
+    form.season.choices = [
+        ('', 'Select Season'),
+        (f"{current_year - 1}-{current_year}", f"{current_year - 1}-{current_year}"),
+        (f"{current_year}-{next_year}", f"{current_year}-{next_year}")
+    ]
+
     if form.validate_on_submit():
         event = Event(
             title=form.title.data,
@@ -137,12 +155,20 @@ def create_event():
             event_type=form.event_type.data,
             start_datetime=form.start_datetime.data,
             end_datetime=form.end_datetime.data,
-            created_by_id=current_user.id
+            created_by_id=current_user.id,
+            season=form.season.data if form.season.data else None
         )
         db.session.add(event)
         db.session.commit()
         flash(f'Event "{form.title.data}" has been created successfully!', 'success')
+
+        # If event is a match or tournament, redirect to add statistics
+        if event.event_type in ['league_game', 'friendly_match', 'tournament']:
+            flash('You can now add statistics for this event.', 'info')
+            return redirect(url_for('admin_stats.event_statistics', event_id=event.id))
+
         return redirect(url_for('admin.manage_events'))
+
     return render_template('admin/create_event.html', title='Create Event', form=form)
 
 
@@ -185,57 +211,3 @@ def delete_event(event_id):
     db.session.commit()
     flash(f'Event "{event.title}" has been deleted.', 'success')
     return redirect(url_for('admin.manage_events'))
-
-
-@admin.route('/events')
-@login_required
-@admin_required
-def manage_events():
-    # Get all events with statistics status
-    events = Event.query.order_by(Event.start_datetime).all()
-
-    # Get current date for comparison
-    current_date = datetime.utcnow()
-
-    return render_template('admin/manage_events.html',
-                           title='Manage Events',
-                           events=events,
-                           current_date=current_date)
-
-
-@admin.route('/events/create', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def create_event():
-    form = EventForm()
-
-    # Add season field to form
-    current_year = datetime.utcnow().year
-    next_year = current_year + 1
-    seasons = [(f"{current_year - 1}-{current_year}", f"{current_year - 1}-{current_year}"),
-               (f"{current_year}-{next_year}", f"{current_year}-{next_year}")]
-    form.season = SelectField('Season', choices=seasons)
-
-    if form.validate_on_submit():
-        event = Event(
-            title=form.title.data,
-            description=form.description.data,
-            location=form.location.data,
-            event_type=form.event_type.data,
-            start_datetime=form.start_datetime.data,
-            end_datetime=form.end_datetime.data,
-            created_by_id=current_user.id,
-            season=form.season.data
-        )
-        db.session.add(event)
-        db.session.commit()
-        flash(f'Event "{form.title.data}" has been created successfully!', 'success')
-
-        # If event is a match or tournament, redirect to add statistics
-        if event.event_type in ['league_game', 'friendly_match', 'tournament']:
-            flash('You can now add statistics for this event.', 'info')
-            return redirect(url_for('admin_stats.event_statistics', event_id=event.id))
-
-        return redirect(url_for('admin.manage_events'))
-
-    return render_template('admin/create_event.html', title='Create Event', form=form)

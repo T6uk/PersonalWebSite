@@ -16,4 +16,5 @@ class EventForm(FlaskForm):
     ])
     start_datetime = DateTimeLocalField('Start Date & Time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
     end_datetime = DateTimeLocalField('End Date & Time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
+    season = SelectField('Season', validators=[Optional()], choices=[])  # Adding the season field
     submit = SubmitField('Save Event')
