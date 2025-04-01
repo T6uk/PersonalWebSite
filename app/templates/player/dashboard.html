@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}Player Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Player Profile</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                        <h4>{{ current_user.username }}</h4>
+                        <p class="text-muted">{{ current_user.email }}</p>
+                    </div>
+
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><strong>Position:</strong></span>
+                            <span>{{ current_user.position or 'Not specified' }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><strong>Jersey Number:</strong></span>
+                            <span>{{ current_user.jersey_number or 'Not assigned' }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><strong>Date of Birth:</strong></span>
+                            <span>{{ current_user.date_of_birth.strftime('%Y-%m-%d') if current_user.date_of_birth else 'Not specified' }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><strong>Height:</strong></span>
+                            <span>{{ current_user.height or 'Not specified' }} cm</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><strong>Weight:</strong></span>
+                            <span>{{ current_user.weight or 'Not specified' }} kg</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Welcome, {{ current_user.username }}!</h3>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Player Dashboard</h5>
+                    <p class="card-text">This is your player dashboard where you can view your information and team details.</p>
+
+                    {% if current_user.bio %}
+                        <div class="mt-4">
+                            <h5>Bio</h5>
+                            <p>{{ current_user.bio }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="alert alert-info mt-4">
+                        <h5 class="alert-heading">Team Updates</h5>
+                        <p>No current team updates. Check back later for announcements from your coach.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

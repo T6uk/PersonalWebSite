@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block title %}Manage Players{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Players</h1>
+        <a href="{{ url_for('admin.create_player') }}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Add New Player
+        </a>
+    </div>
+
+    {% if players %}
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Position</th>
+                                <th>Jersey #</th>
+                                <th>Date of Birth</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in players %}
+                                <tr>
+                                    <td>{{ player.id }}</td>
+                                    <td>{{ player.username }}</td>
+                                    <td>{{ player.email }}</td>
+                                    <td>{{ player.position or 'N/A' }}</td>
+                                    <td>{{ player.jersey_number or 'N/A' }}</td>
+                                    <td>{{ player.date_of_birth.strftime('%Y-%m-%d') if player.date_of_birth else 'N/A' }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ player.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Delete Confirmation Modal -->
+                                        <div class="modal fade" id="deleteModal{{ player.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ player.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel{{ player.id }}">Confirm Delete</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete player <strong>{{ player.username }}</strong>?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <form action="{{ url_for('admin.delete_player', player_id=player.id) }}" method="POST">
+                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <h4 class="alert-heading">No Players Found!</h4>
+            <p>There are currently no players in the system. Click the button above to add your first player.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

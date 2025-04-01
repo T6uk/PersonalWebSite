@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                    <h2 class="card-title">{{ player_count }}</h2>
+                    <p class="card-text">Total Players</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin.manage_players') }}" class="btn btn-primary btn-sm w-100">View Players</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-plus fa-3x mb-3 text-success"></i>
+                    <h5 class="card-title">Add New Player</h5>
+                    <p class="card-text">Create a new player account</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin.create_player') }}" class="btn btn-success btn-sm w-100">Create Player</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-cog fa-3x mb-3 text-secondary"></i>
+                    <h5 class="card-title">Team Management</h5>
+                    <p class="card-text">Manage your team roster</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin.manage_players') }}" class="btn btn-secondary btn-sm w-100">Manage Team</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
