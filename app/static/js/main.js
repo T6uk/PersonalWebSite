@@ -1,4 +1,4 @@
-// Main JavaScript for FC Mara Team Manager
+// app/static/js/main.js
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize tooltips
@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Auto-dismiss alerts after 5 seconds
-    const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+    // Auto-dismiss alerts after 5 seconds (except for ones marked to stay)
+    const alerts = document.querySelectorAll('.alert:not(.alert-permanent):not(.alert-info)');
     alerts.forEach(function(alert) {
         setTimeout(function() {
             const bsAlert = new bootstrap.Alert(alert);
