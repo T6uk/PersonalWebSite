@@ -3,20 +3,8 @@ from flask_login import login_required, current_user
 from app import db
 from app.players import bp
 from app.players.forms import PlayerProfileForm
-from app.models import User, PlayerProfile
-from functools import wraps
-
-
-def coach_or_admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or (not current_user.is_coach() and not current_user.is_admin()):
-            flash('You do not have permission to access this page', 'danger')
-            return redirect(url_for('core.home'))
-        return f(*args, **kwargs)
-
-    return decorated_function
-
+from app.models import User, PlayerProfile, Card, Goal
+from app.utils.decorators import coach_or_admin_required
 
 @bp.route('/list')
 @login_required
@@ -54,9 +42,29 @@ def player_profile(user_id):
         flash('Player profile updated successfully', 'success')
         return redirect(url_for('players.player_profile', user_id=user.id))
 
+    # Get player statistics
+    goals = Goal.query.filter_by(player_id=user.id).all()
+    cards = Card.query.filter_by(player_id=user.id).all()
+
+    # Count statistics
+    total_goals = len(goals)
+    penalty_goals = sum(1 for goal in goals if goal.is_penalty)
+    yellow_cards = sum(1 for card in cards if card.card_type == 'yellow')
+    red_cards = sum(1 for card in cards if card.card_type == 'red')
+
+    # Get recent matches where this player scored or received cards
+    recent_goals = Goal.query.filter_by(player_id=user.id).order_by(Goal.created_at.desc()).limit(5).all()
+    recent_cards = Card.query.filter_by(player_id=user.id).order_by(Card.created_at.desc()).limit(5).all()
+
     return render_template('players/profile.html',
                            title=f'{user.username}\'s Profile',
                            user=user,
                            profile=profile,
                            form=form,
-                           can_edit=can_edit)
+                           can_edit=can_edit,
+                           total_goals=total_goals,
+                           penalty_goals=penalty_goals,
+                           yellow_cards=yellow_cards,
+                           red_cards=red_cards,
+                           recent_goals=recent_goals,
+                           recent_cards=recent_cards)

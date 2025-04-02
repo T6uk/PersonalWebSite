@@ -64,16 +64,66 @@ class PlayerProfile(db.Model):
         return f'<PlayerProfile {self.user.username}>'
 
 
+class MatchType:
+    FRIENDLY = 'friendly'
+    LEAGUE = 'league'
+    TOURNAMENT = 'tournament'
+    CUP = 'cup'
+
+
+class CardType:
+    YELLOW = 'yellow'
+    RED = 'red'
+
+
+class Goal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    player_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    minute = db.Column(db.Integer, nullable=False)
+    is_own_goal = db.Column(db.Boolean, default=False)
+    is_penalty = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship
+    player = db.relationship('User')
+
+    def __repr__(self):
+        return f'<Goal by {self.player.username} at {self.minute}>'
+
+
+class Card(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    player_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    card_type = db.Column(db.String(10), nullable=False)
+    minute = db.Column(db.Integer, nullable=False)
+    reason = db.Column(db.String(200), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship
+    player = db.relationship('User')
+
+    def __repr__(self):
+        return f'<{self.card_type.capitalize()} Card for {self.player.username} at {self.minute}>'
+
+
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     opponent = db.Column(db.String(100), nullable=False)
     match_date = db.Column(db.DateTime, nullable=False)
     location = db.Column(db.String(100), nullable=False)
     is_home_game = db.Column(db.Boolean, default=True)
+    match_type = db.Column(db.String(20), default=MatchType.FRIENDLY)
+    tournament_name = db.Column(db.String(100), nullable=True)
     score_team = db.Column(db.Integer, nullable=True)
     score_opponent = db.Column(db.Integer, nullable=True)
     notes = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    goals = db.relationship('Goal', backref='match', lazy='dynamic', cascade='all, delete-orphan')
+    cards = db.relationship('Card', backref='match', lazy='dynamic', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'<Match vs {self.opponent} on {self.match_date}>'

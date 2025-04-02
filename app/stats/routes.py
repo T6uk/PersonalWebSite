@@ -3,7 +3,7 @@ from flask import render_template
 from flask_login import login_required
 from app import db
 from app.stats import bp
-from app.models import Match, User, PlayerProfile
+from app.models import Match, User, PlayerProfile, Goal, Card
 import datetime
 import json  # Add this import
 
@@ -64,6 +64,26 @@ def dashboard():
     upcoming_matches = Match.query.filter(Match.match_date >= today).order_by(Match.match_date).limit(3).all()
     recent_matches = Match.query.filter(Match.match_date < today).order_by(Match.match_date.desc()).limit(3).all()
 
+    # Get player stats for top performers
+    top_scorers = db.session.query(
+        User, db.func.count(Goal.id).label('goals')
+    ).join(Goal, User.id == Goal.player_id).group_by(User.id).order_by(db.desc('goals')).limit(5).all()
+
+    recent_goals = db.session.query(
+        User, Goal, Match
+    ).join(Goal, User.id == Goal.player_id).join(Match, Goal.match_id == Match.id).order_by(
+        Goal.created_at.desc()).limit(10).all()
+
+    yellow_cards = db.session.query(
+        User, db.func.count(Card.id).label('cards')
+    ).join(Card, User.id == Card.player_id).filter(Card.card_type == 'yellow').group_by(User.id).order_by(
+        db.desc('cards')).limit(5).all()
+
+    red_cards = db.session.query(
+        User, db.func.count(Card.id).label('cards')
+    ).join(Card, User.id == Card.player_id).filter(Card.card_type == 'red').group_by(User.id).order_by(
+        db.desc('cards')).limit(5).all()
+
     return render_template('stats/dashboard.html',
                            title='Team Statistics',
                            total_matches=total_matches,
@@ -77,4 +97,8 @@ def dashboard():
                            results_data=results_data,
                            win_percentage=win_percentage,
                            upcoming_matches=upcoming_matches,
-                           recent_matches=recent_matches)
+                           recent_matches=recent_matches,
+                           top_scorers=top_scorers,
+                           recent_goals=recent_goals,
+                           yellow_cards=yellow_cards,
+                           red_cards=red_cards)

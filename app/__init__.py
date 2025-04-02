@@ -21,6 +21,10 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login_manager.init_app(app)
 
+    # Set up logger
+    from app.utils.logger import setup_logger
+    setup_logger(app)
+
     # Add this inside create_app() function
     @app.context_processor
     def inject_year():
@@ -46,6 +50,13 @@ def create_app(config_class=Config):
     from app.stats import bp as stats_bp
     app.register_blueprint(stats_bp)
 
+    # Register new blueprints
+    from app.errors import bp as errors_bp
+    app.register_blueprint(errors_bp)
+
+    from app.api import bp as api_bp
+    app.register_blueprint(api_bp)
+
     # Create initial admin account if it doesn't exist
     with app.app_context():
         # Import models here to avoid circular imports
@@ -55,4 +66,3 @@ def create_app(config_class=Config):
         create_initial_admin()
 
     return app
-

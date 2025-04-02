@@ -9,70 +9,123 @@
 
             <!-- Summary Cards -->
             <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card text-white bg-primary mb-3">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Total Matches</h5>
-                            <h2 class="display-4">{{ total_matches }}</h2>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-white bg-primary h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white-50">Total Matches</h6>
+                                    <h2 class="display-5 mb-0">{{ total_matches }}</h2>
+                                </div>
+                                <i class="bi bi-calendar-check fs-1"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card text-white bg-success mb-3">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Win Percentage</h5>
-                            <h2 class="display-4">{{ win_percentage }}%</h2>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-white bg-success h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white-50">Win Percentage</h6>
+                                    <h2 class="display-5 mb-0">{{ win_percentage }}%</h2>
+                                </div>
+                                <i class="bi bi-trophy fs-1"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card text-white bg-info mb-3">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Goals Scored</h5>
-                            <h2 class="display-4">{{ goals_scored }}</h2>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-white bg-info h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white-50">Goals Scored</h6>
+                                    <h2 class="display-5 mb-0">{{ goals_scored }}</h2>
+                                </div>
+                                <i class="bi bi-bullseye fs-1"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card text-white bg-secondary mb-3">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Total Players</h5>
-                            <h2 class="display-4">{{ total_players }}</h2>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-white bg-secondary h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white-50">Total Players</h6>
+                                    <h2 class="display-5 mb-0">{{ total_players }}</h2>
+                                </div>
+                                <i class="bi bi-people fs-1"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Results and Positions Charts -->
+            <!-- Match Stats and Performance Charts -->
             <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">Match Results</h5>
+                            <i class="bi bi-pie-chart"></i>
                         </div>
                         <div class="card-body">
                             <div class="text-center mb-3">
-                                <div class="d-inline-block mx-3">
-                                    <span class="badge bg-success p-2">Wins: {{ wins }}</span>
+                                <div class="d-inline-block mx-2">
+                                    <span class="badge bg-success p-2"><i
+                                            class="bi bi-check-circle me-1"></i> Wins: {{ wins }}</span>
                                 </div>
-                                <div class="d-inline-block mx-3">
-                                    <span class="badge bg-warning text-dark p-2">Draws: {{ draws }}</span>
+                                <div class="d-inline-block mx-2">
+                                    <span class="badge bg-warning text-dark p-2"><i class="bi bi-dash-circle me-1"></i> Draws: {{ draws }}</span>
                                 </div>
-                                <div class="d-inline-block mx-3">
-                                    <span class="badge bg-danger p-2">Losses: {{ losses }}</span>
+                                <div class="d-inline-block mx-2">
+                                    <span class="badge bg-danger p-2"><i
+                                            class="bi bi-x-circle me-1"></i> Losses: {{ losses }}</span>
                                 </div>
                             </div>
-                            <canvas id="resultsChart" height="250"></canvas>
+                            <canvas id="resultsChart" height="220"></canvas>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">Players by Position</h5>
+                            <i class="bi bi-bar-chart"></i>
                         </div>
                         <div class="card-body">
-                            <canvas id="positionsChart" height="250"></canvas>
+                            <canvas id="positionsChart" height="220"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals Analysis -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Goals Analysis</h5>
+                    <i class="bi bi-graph-up"></i>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h2 class="display-4">{{ goals_scored }}</h2>
+                                <p class="lead mb-0">Goals Scored</p>
+                            </div>
+                            <div class="text-center mt-4">
+                                <h2 class="display-4">{{ goals_conceded }}</h2>
+                                <p class="lead mb-0">Goals Conceded</p>
+                            </div>
+                            <div class="text-center mt-4">
+                                <h2 class="display-4">{{ goals_scored - goals_conceded }}</h2>
+                                <p class="lead mb-0">Goal Difference</p>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <canvas id="goalsChart" height="250"></canvas>
                         </div>
                     </div>
                 </div>
@@ -80,128 +133,275 @@
 
             <!-- Recent and Upcoming Matches -->
             <div class="row">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">Recent Matches</h5>
+                            <i class="bi bi-clock-history"></i>
                         </div>
                         <div class="card-body">
-                            <ul class="list-group">
-                                {% for match in recent_matches %}
-                                    <li class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>{{ match.match_date.strftime('%b %d, %Y') }}</strong>:
-                                                {% if match.is_home_game %}
-                                                    FC Mara vs {{ match.opponent }}
-                                                {% else %}
-                                                    {{ match.opponent }} vs FC Mara
-                                                {% endif %}
+                            {% if recent_matches %}
+                                <ul class="list-group list-group-flush">
+                                    {% for match in recent_matches %}
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="badge bg-light text-dark">{{ match.match_date.strftime('%b %d, %Y') }}</span>
+                                                    {% if match.is_home_game %}
+                                                        FC Mara vs {{ match.opponent }}
+                                                    {% else %}
+                                                        {{ match.opponent }} vs FC Mara
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    {% if match.score_team is not none and match.score_opponent is not none %}
+                                                        <span class="badge rounded-pill
+                                                        {% if match.score_team > match.score_opponent %}bg-success
+                                                        {% elif match.score_team == match.score_opponent %}bg-warning text-dark
+                                                        {% else %}bg-danger{% endif %}">
+                                                        {{ match.score_team }} - {{ match.score_opponent }}
+                                                    </span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">No Result</span>
+                                                    {% endif %}
+                                                </div>
                                             </div>
-                                            <div>
-                                                {% if match.score_team is not none and match.score_opponent is not none %}
-                                                    <span class="badge rounded-pill
-                                                {% if match.score_team > match.score_opponent %}bg-success
-                                                {% elif match.score_team == match.score_opponent %}bg-warning text-dark
-                                                {% else %}bg-danger{% endif %}">
-                                                {{ match.score_team }} - {{ match.score_opponent }}
-                                            </span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary">No Result</span>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-center py-3">No recent matches found.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="card mb-4">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="card-title mb-0">User Management</h5>
-                            </div>
-                            <div class="card-body">
-                                <p>Create and manage user accounts for players and coaches.</p>
-                                <div class="d-grid">
-                                    <a href="{{ url_for('admin.create_user') }}" class="btn btn-primary">Create New
-                                        User</a>
-                                </div>
-                                <div class="d-grid mt-2">
-                                    <a href="{{ url_for('admin.view_users') }}" class="btn btn-outline-primary">View All
-                                        Users</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="card mb-4">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="card-title mb-0">Match Management</h5>
-                            </div>
-                            <div class="card-body">
-                                <p>Schedule matches and update match results.</p>
-                                <div class="d-grid">
-                                    <a href="{{ url_for('matches.create_match') }}" class="btn btn-primary">Schedule
-                                        Match</a>
-                                </div>
-                                <div class="d-grid mt-2">
-                                    <a href="{{ url_for('matches.schedule') }}" class="btn btn-outline-primary">View
-                                        Schedule</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="card mb-4">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="card-title mb-0">Team Statistics</h5>
-                            </div>
-                            <div class="card-body">
-                                <p>View team performance statistics and analytics.</p>
-                                <div class="d-grid">
-                                    <a href="{{ url_for('stats.dashboard') }}" class="btn btn-primary">View
-                                        Statistics</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">Upcoming Matches</h5>
+                            <i class="bi bi-calendar-event"></i>
                         </div>
                         <div class="card-body">
-                            <ul class="list-group">
-                                {% for match in upcoming_matches %}
-                                    <li class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>{{ match.match_date.strftime('%b %d, %Y') }}</strong>:
-                                                {% if match.is_home_game %}
-                                                    FC Mara vs {{ match.opponent }}
-                                                {% else %}
-                                                    {{ match.opponent }} vs FC Mara
-                                                {% endif %}
+                            {% if upcoming_matches %}
+                                <ul class="list-group list-group-flush">
+                                    {% for match in upcoming_matches %}
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="badge bg-light text-dark">{{ match.match_date.strftime('%b %d, %Y') }}</span>
+                                                    {% if match.is_home_game %}
+                                                        FC Mara vs {{ match.opponent }}
+                                                    {% else %}
+                                                        {{ match.opponent }} vs FC Mara
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-info">{{ match.match_date.strftime('%H:%M') }}</span>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <span class="badge bg-info">{{ match.match_date.strftime('%H:%M') }}</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-center py-3">No upcoming matches scheduled.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Player Performance -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Top Goalscorers</h5>
+                            <i class="bi bi-star"></i>
+                        </div>
+                        <div class="card-body">
+                            {% if top_scorers %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Player</th>
+                                            <th>Goals</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for rank, (player, goals) in enumerate(top_scorers, 1) %}
+                                            <tr>
+                                                <td>{{ rank }}</td>
+                                                <td>
+                                                    <a href="{{ url_for('players.player_profile', user_id=player.id) }}"
+                                                       class="text-decoration-none">
+                                                        {{ player.username }}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary">{{ goals }}</span>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-center py-3">No goal data available yet.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
 
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Discipline Records</h5>
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="disciplineTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="yellow-tab" data-bs-toggle="tab"
+                                            data-bs-target="#yellow-tab-pane" type="button" role="tab"
+                                            aria-controls="yellow-tab-pane" aria-selected="true">Yellow Cards
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="red-tab" data-bs-toggle="tab"
+                                            data-bs-target="#red-tab-pane" type="button" role="tab"
+                                            aria-controls="red-tab-pane" aria-selected="false">Red Cards
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content pt-3" id="disciplineTabsContent">
+                                <div class="tab-pane fade show active" id="yellow-tab-pane" role="tabpanel"
+                                     aria-labelledby="yellow-tab" tabindex="0">
+                                    {% if yellow_cards %}
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Player</th>
+                                                    <th>Yellow Cards</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for rank, (player, cards) in enumerate(yellow_cards, 1) %}
+                                                    <tr>
+                                                        <td>{{ rank }}</td>
+                                                        <td>
+                                                            <a href="{{ url_for('players.player_profile', user_id=player.id) }}"
+                                                               class="text-decoration-none">
+                                                                {{ player.username }}
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-warning text-dark">{{ cards }}</span>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-center py-3">No yellow card data available yet.</p>
+                                    {% endif %}
+                                </div>
+                                <div class="tab-pane fade" id="red-tab-pane" role="tabpanel" aria-labelledby="red-tab"
+                                     tabindex="0">
+                                    {% if red_cards %}
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Player</th>
+                                                    <th>Red Cards</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for rank, (player, cards) in enumerate(red_cards, 1) %}
+                                                    <tr>
+                                                        <td>{{ rank }}</td>
+                                                        <td>
+                                                            <a href="{{ url_for('players.player_profile', user_id=player.id) }}"
+                                                               class="text-decoration-none">
+                                                                {{ player.username }}
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-danger">{{ cards }}</span>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-center py-3">No red card data available yet.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Goals</h5>
+                    <i class="bi bi-bullseye"></i>
+                </div>
+                <div class="card-body">
+                    {% if recent_goals %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Match</th>
+                                    <th>Time</th>
+                                    <th>Type</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for player, goal, match in recent_goals %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('players.player_profile', user_id=player.id) }}"
+                                               class="text-decoration-none">
+                                                {{ player.username }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('matches.match_details', match_id=match.id) }}"
+                                               class="text-decoration-none">
+                                                FC Mara vs {{ match.opponent }}
+                                            </a>
+                                            <small class="text-muted d-block">{{ match.match_date.strftime('%b %d, %Y') }}</small>
+                                        </td>
+                                        <td>{{ goal.minute }}'</td>
+                                        <td>
+                                            {% if goal.is_penalty %}
+                                                <span class="badge bg-info">Penalty</span>
+                                            {% elif goal.is_own_goal %}
+                                                <span class="badge bg-warning text-dark">Own Goal</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Regular</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center py-3">No goal data available yet.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -214,15 +414,15 @@
             // Results Chart
             const resultsCtx = document.getElementById('resultsChart').getContext('2d');
             const resultsChart = new Chart(resultsCtx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: JSON.parse({{ results_data.labels|safe }}),
                     datasets: [{
                         data: JSON.parse({{ results_data.values|safe }}),
                         backgroundColor: [
-                            'rgba(40, 167, 69, 0.7)',
-                            'rgba(255, 193, 7, 0.7)',
-                            'rgba(220, 53, 69, 0.7)'
+                            'rgba(40, 167, 69, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(220, 53, 69, 0.8)'
                         ],
                         borderColor: [
                             'rgba(40, 167, 69, 1)',
@@ -234,11 +434,16 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                padding: 20
+                            }
                         }
-                    }
+                    },
+                    cutout: '60%'
                 }
             });
 
@@ -251,13 +456,24 @@
                     datasets: [{
                         label: 'Number of Players',
                         data: JSON.parse({{ position_data.values|safe }}),
-                        backgroundColor: 'rgba(26, 61, 124, 0.7)',
-                        borderColor: 'rgba(26, 61, 124, 1)',
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.7)',  // Goalkeepers
+                            'rgba(0, 123, 255, 0.7)',  // Defenders
+                            'rgba(23, 162, 184, 0.7)', // Midfielders
+                            'rgba(220, 53, 69, 0.7)'   // Forwards
+                        ],
+                        borderColor: [
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(0, 123, 255, 1)',
+                            'rgba(23, 162, 184, 1)',
+                            'rgba(220, 53, 69, 1)'
+                        ],
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -269,6 +485,38 @@
                     plugins: {
                         legend: {
                             display: false
+                        }
+                    }
+                }
+            });
+
+            // Goals Analysis Chart
+            const goalsCtx = document.getElementById('goalsChart').getContext('2d');
+            const goalsChart = new Chart(goalsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Goals Scored', 'Goals Conceded', 'Goal Difference'],
+                    datasets: [{
+                        label: 'Goals',
+                        data: [{{ goals_scored }}, {{ goals_conceded }}, {{ goals_scored - goals_conceded }}],
+                        backgroundColor: 'rgba(26, 61, 124, 0.2)',
+                        borderColor: 'rgba(26, 61, 124, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
                         }
                     }
                 }

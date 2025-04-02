@@ -1,0 +1,29 @@
+{% macro render_field(field, label_class="form-label", field_class="form-control", extra_attrs="") %}
+    <div class="mb-3">
+        {{ field.label(class=label_class) }}
+
+        {% if field.errors %}
+            {{ field(class=field_class + " is-invalid", **kwargs)|safe }}
+            <div class="invalid-feedback">
+                {% for error in field.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ field(class=field_class, **kwargs)|safe }}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro render_checkbox(field) %}
+    <div class="mb-3 form-check">
+        {{ field(class="form-check-input") }}
+        {{ field.label(class="form-check-label") }}
+    </div>
+{% endmacro %}
+
+{% macro render_submit_button(field, class="btn btn-primary") %}
+    <div class="d-grid">
+        {{ field(class=class) }}
+    </div>
+{% endmacro %}

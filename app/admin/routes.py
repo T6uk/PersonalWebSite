@@ -4,19 +4,7 @@ from app import db
 from app.admin import bp
 from app.admin.forms import CreateUserForm
 from app.models import User
-from functools import wraps
-
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or not current_user.is_admin():
-            flash('You do not have permission to access this page', 'danger')
-            return redirect(url_for('core.home'))
-        return f(*args, **kwargs)
-
-    return decorated_function
-
+from app.utils.decorators import admin_required
 
 @bp.route('/dashboard')
 @login_required

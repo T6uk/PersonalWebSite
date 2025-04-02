@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card mt-5">
+            <div class="card-header bg-danger text-white">
+                <h3 class="card-title">500 - Server Error</h3>
+            </div>
+            <div class="card-body text-center">
+                <p class="lead">An unexpected error has occurred.</p>
+                <p>The server encountered an internal error and was unable to complete your request.</p>
+                <a href="{{ url_for('core.home') }}" class="btn btn-primary mt-3">
+                    Return to Home Page
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,92 +1,291 @@
 {% extends "base.html" %}
+{% from "macros/forms.html" import render_field, render_submit_button %}
 
 {% block title %}{{ user.username }}'s Profile{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8 offset-md-2">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h3 class="card-title">Player Profile: {{ user.username }}</h3>
-            </div>
-            <div class="card-body">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">Player Profile: {{ user.username }}</h3>
+                    {% if can_edit %}
+                        <span class="badge bg-light text-primary">Coach Edit Mode</span>
+                    {% endif %}
+                </div>
+
                 {% if can_edit %}
-                <form method="POST" action="">
-                    {{ form.hidden_tag() }}
+                    <div class="card-body">
+                        <form method="POST" action="">
+                            {{ form.hidden_tag() }}
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.position.label(class="form-label") }}
-                            {{ form.position(class="form-select") }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form.jersey_number.label(class="form-label") }}
-                            {{ form.jersey_number(class="form-control") }}
-                        </div>
-                    </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ render_field(form.position, field_class="form-select") }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ render_field(form.jersey_number) }}
+                                </div>
+                            </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.height.label(class="form-label") }}
-                            {{ form.height(class="form-control") }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form.weight.label(class="form-label") }}
-                            {{ form.weight(class="form-control") }}
-                        </div>
-                    </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ render_field(form.height) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ render_field(form.weight) }}
+                                </div>
+                            </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.date_of_birth.label(class="form-label") }}
-                            {{ form.date_of_birth(class="form-control", type="date") }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form.dominant_foot.label(class="form-label") }}
-                            {{ form.dominant_foot(class="form-select") }}
-                        </div>
-                    </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ render_field(form.date_of_birth, type="date") }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ render_field(form.dominant_foot, field_class="form-select") }}
+                                </div>
+                            </div>
 
-                    <div class="mb-3">
-                        {{ form.bio.label(class="form-label") }}
-                        {{ form.bio(class="form-control", rows=5) }}
-                    </div>
+                            <div class="mb-3">
+                                {{ render_field(form.bio, rows="5") }}
+                            </div>
 
-                    <div class="d-grid">
-                        {{ form.submit(class="btn btn-primary") }}
+                            {{ render_submit_button(form.submit) }}
+                        </form>
                     </div>
-                </form>
                 {% else %}
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>Position</h5>
-                        <p>{{ profile.position|capitalize if profile.position else 'Not specified' }}</p>
+                    <div class="card-body">
+                        <div class="player-info mb-4">
+                            <div class="row">
+                                <div class="col-md-4 text-center mb-4 mb-md-0">
+                                    <div class="player-avatar mb-3">
+                                        <div class="avatar-circle
+                                    {% if profile.position == 'goalkeeper' %}bg-success
+                                    {% elif profile.position == 'defender' %}bg-primary
+                                    {% elif profile.position == 'midfielder' %}bg-info
+                                    {% elif profile.position == 'forward' %}bg-danger
+                                    {% else %}bg-secondary{% endif %}">
+                                            {% if profile.jersey_number %}
+                                                <span class="jersey-number">{{ profile.jersey_number }}</span>
+                                            {% else %}
+                                                <i class="bi bi-person-fill"></i>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <h4>{{ user.username }}</h4>
+                                    {% if profile.position %}
+                                        <span class="badge
+                                {% if profile.position == 'goalkeeper' %}bg-success
+                                {% elif profile.position == 'defender' %}bg-primary
+                                {% elif profile.position == 'midfielder' %}bg-info
+                                {% elif profile.position == 'forward' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ profile.position|capitalize }}
+                            </span>
+                                    {% endif %}
+                                </div>
 
-                        <h5>Jersey Number</h5>
-                        <p>{{ profile.jersey_number if profile.jersey_number else 'Not specified' }}</p>
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="player-stat">
+                                                <h6 class="text-muted mb-1">Position</h6>
+                                                <p class="mb-0 fs-5">{{ profile.position|capitalize if profile.position else 'Not specified' }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="player-stat">
+                                                <h6 class="text-muted mb-1">Jersey Number</h6>
+                                                <p class="mb-0 fs-5">{{ profile.jersey_number if profile.jersey_number else 'Not specified' }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="player-stat">
+                                                <h6 class="text-muted mb-1">Date of Birth</h6>
+                                                <p class="mb-0 fs-5">{{ profile.date_of_birth.strftime('%B %d, %Y') if profile.date_of_birth else 'Not specified' }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="player-stat">
+                                                <h6 class="text-muted mb-1">Height</h6>
+                                                <p class="mb-0 fs-5">{{ profile.height ~ ' cm' if profile.height else 'Not specified' }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="player-stat">
+                                                <h6 class="text-muted mb-1">Weight</h6>
+                                                <p class="mb-0 fs-5">{{ profile.weight ~ ' kg' if profile.weight else 'Not specified' }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="player-stat">
+                                                <h6 class="text-muted mb-1">Dominant Foot</h6>
+                                                <p class="mb-0 fs-5">{{ profile.dominant_foot|capitalize if profile.dominant_foot else 'Not specified' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                        <h5>Date of Birth</h5>
-                        <p>{{ profile.date_of_birth.strftime('%B %d, %Y') if profile.date_of_birth else 'Not specified' }}</p>
+                        <div class="player-bio mt-4">
+                            <h5>Player Bio</h5>
+                            <div class="p-3 bg-light rounded">
+                                {% if profile.bio %}
+                                    <p class="mb-0">{{ profile.bio }}</p>
+                                {% else %}
+                                    <p class="text-muted mb-0">No bio information available.</p>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <h5>Height</h5>
-                        <p>{{ profile.height ~ ' cm' if profile.height else 'Not specified' }}</p>
+                {% endif %}
+                {% if not can_edit %}
+                    <!-- Player Statistics Section -->
+                    <div class="player-stats mt-5">
+                        <h5 class="mb-3">Player Statistics</h5>
 
-                        <h5>Weight</h5>
-                        <p>{{ profile.weight ~ ' kg' if profile.weight else 'Not specified' }}</p>
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <h1 class="display-4 mb-0 team-color-primary">{{ total_goals }}</h1>
+                                        <p class="text-muted">Goals</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <h1 class="display-4 mb-0 team-color-primary">{{ penalty_goals }}</h1>
+                                        <p class="text-muted">Penalties</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <h1 class="display-4 mb-0 text-warning">{{ yellow_cards }}</h1>
+                                        <p class="text-muted">Yellow Cards</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <h1 class="display-4 mb-0 text-danger">{{ red_cards }}</h1>
+                                        <p class="text-muted">Red Cards</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                        <h5>Dominant Foot</h5>
-                        <p>{{ profile.dominant_foot|capitalize if profile.dominant_foot else 'Not specified' }}</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card shadow-sm mb-4">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="card-title mb-0">Recent Goals</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if recent_goals %}
+                                            <ul class="list-group list-group-flush">
+                                                {% for goal in recent_goals %}
+                                                    <li class="list-group-item">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <span class="badge bg-primary">{{ goal.minute }}'</span>
+                                                                <a href="{{ url_for('matches.match_details', match_id=goal.match_id) }}"
+                                                                   class="ms-2 text-decoration-none">
+                                                                    vs {{ goal.match.opponent }}
+                                                                    ({{ goal.match.match_date.strftime('%b %d, %Y') }})
+                                                                </a>
+                                                                {% if goal.is_penalty %}
+                                                                    <span class="badge bg-info">Penalty</span>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p class="text-center py-3 text-muted">No goals recorded yet.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card shadow-sm mb-4">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="card-title mb-0">Recent Cards</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if recent_cards %}
+                                            <ul class="list-group list-group-flush">
+                                                {% for card in recent_cards %}
+                                                    <li class="list-group-item">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <span class="badge bg-secondary">{{ card.minute }}'</span>
+                                                                <a href="{{ url_for('matches.match_details', match_id=card.match_id) }}"
+                                                                   class="ms-2 text-decoration-none">
+                                                                    vs {{ card.match.opponent }}
+                                                                    ({{ card.match.match_date.strftime('%b %d, %Y') }})
+                                                                </a>
+                                                                {% if card.card_type == 'yellow' %}
+                                                                    <span class="badge bg-warning text-dark">Yellow</span>
+                                                                {% else %}
+                                                                    <span class="badge bg-danger">Red</span>
+                                                                {% endif %}
+                                                                {% if card.reason %}
+                                                                    <small class="text-muted ms-2">{{ card.reason }}</small>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p class="text-center py-3 text-muted">No cards recorded yet.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="mt-4">
-                    <h5>Bio</h5>
-                    <p>{{ profile.bio if profile.bio else 'No bio information available.' }}</p>
-                </div>
                 {% endif %}
             </div>
         </div>
     </div>
-</div>
+{% endblock %}
+
+{% block styles %}
+    <style>
+        .avatar-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .avatar-circle .jersey-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .avatar-circle .bi-person-fill {
+            font-size: 3.5rem;
+            color: white;
+        }
+
+        .player-stat {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            height: 100%;
+        }
+    </style>
 {% endblock %}

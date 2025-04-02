@@ -1,77 +1,81 @@
 {% extends "base.html" %}
+{% from "macros/forms.html" import render_field, render_checkbox, render_submit_button %}
 
 {% block title %}Schedule Match{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-8 offset-md-2">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h3 class="card-title">Schedule New Match</h3>
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0">Schedule New Match</h3>
+                <i class="bi bi-calendar-plus"></i>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('matches.create_match') }}">
+                <form method="POST" action="{{ url_for('matches.create_match') }}" class="needs-validation" novalidate>
                     {{ form.hidden_tag() }}
 
-                    <div class="mb-3">
-                        {{ form.opponent.label(class="form-label") }}
-                        {% if form.opponent.errors %}
-                            {{ form.opponent(class="form-control is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.opponent.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.opponent(class="form-control") }}
-                        {% endif %}
+                    <div class="row">
+                        <div class="col-md-8">
+                            {{ render_field(form.opponent) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ render_checkbox(form.is_home_game) }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.match_date, type="datetime-local") }}
+                            <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM</small>
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.location) }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.match_type, field_class="form-select") }}
+                        </div>
+                        <div class="col-md-6 tournament-field">
+                            {{ render_field(form.tournament_name) }}
+                        </div>
                     </div>
 
                     <div class="mb-3">
-                        {{ form.match_date.label(class="form-label") }}
-                        {% if form.match_date.errors %}
-                            {{ form.match_date(class="form-control is-invalid", type="datetime-local") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.match_date.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.match_date(class="form-control", type="datetime-local") }}
-                        {% endif %}
-                        <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM</small>
+                        {{ render_field(form.notes, rows="3") }}
                     </div>
 
-                    <div class="mb-3">
-                        {{ form.location.label(class="form-label") }}
-                        {% if form.location.errors %}
-                            {{ form.location(class="form-control is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.location.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.location(class="form-control") }}
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-3 form-check">
-                        {{ form.is_home_game(class="form-check-input") }}
-                        {{ form.is_home_game.label(class="form-check-label") }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.notes.label(class="form-label") }}
-                        {{ form.notes(class="form-control", rows=3) }}
-                    </div>
-
-                    <div class="d-grid">
-                        {{ form.submit(class="btn btn-primary") }}
-                    </div>
+                    {{ render_submit_button(form.submit) }}
                 </form>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const matchTypeSelect = document.getElementById('match_type');
+    const tournamentField = document.querySelector('.tournament-field');
+
+    // Initial visibility
+    updateTournamentField();
+
+    // Update on change
+    matchTypeSelect.addEventListener('change', updateTournamentField);
+
+    function updateTournamentField() {
+        if (matchTypeSelect.value === 'tournament' || matchTypeSelect.value === 'league' || matchTypeSelect.value === 'cup') {
+            tournamentField.style.display = 'block';
+        } else {
+            tournamentField.style.display = 'none';
+            document.getElementById('tournament_name').value = '';
+        }
+    }
+});
+</script>
 {% endblock %}
