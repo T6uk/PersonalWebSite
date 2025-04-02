@@ -216,9 +216,9 @@
             const resultsChart = new Chart(resultsCtx, {
                 type: 'pie',
                 data: {
-                    labels: {{ results_data.labels|tojson }},
+                    labels: JSON.parse({{ results_data.labels|safe }}),
                     datasets: [{
-                        data: {{ results_data.values|tojson }},
+                        data: JSON.parse({{ results_data.values|safe }}),
                         backgroundColor: [
                             'rgba(40, 167, 69, 0.7)',
                             'rgba(255, 193, 7, 0.7)',
@@ -247,10 +247,10 @@
             const positionsChart = new Chart(positionsCtx, {
                 type: 'bar',
                 data: {
-                    labels: {{ position_data.labels|tojson }},
+                    labels: JSON.parse({{ position_data.labels|safe }}),
                     datasets: [{
                         label: 'Number of Players',
-                        data: {{ position_data.values|tojson }},
+                        data: JSON.parse({{ position_data.values|safe }}),
                         backgroundColor: 'rgba(26, 61, 124, 0.7)',
                         borderColor: 'rgba(26, 61, 124, 1)',
                         borderWidth: 1
