@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title">Player Profile: {{ user.username }}</h3>
+            </div>
+            <div class="card-body">
+                {% if can_edit %}
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.position.label(class="form-label") }}
+                            {{ form.position(class="form-select") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.jersey_number.label(class="form-label") }}
+                            {{ form.jersey_number(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.height.label(class="form-label") }}
+                            {{ form.height(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.weight.label(class="form-label") }}
+                            {{ form.weight(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.date_of_birth.label(class="form-label") }}
+                            {{ form.date_of_birth(class="form-control", type="date") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.dominant_foot.label(class="form-label") }}
+                            {{ form.dominant_foot(class="form-select") }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.bio.label(class="form-label") }}
+                        {{ form.bio(class="form-control", rows=5) }}
+                    </div>
+
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+                {% else %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Position</h5>
+                        <p>{{ profile.position|capitalize if profile.position else 'Not specified' }}</p>
+
+                        <h5>Jersey Number</h5>
+                        <p>{{ profile.jersey_number if profile.jersey_number else 'Not specified' }}</p>
+
+                        <h5>Date of Birth</h5>
+                        <p>{{ profile.date_of_birth.strftime('%B %d, %Y') if profile.date_of_birth else 'Not specified' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Height</h5>
+                        <p>{{ profile.height ~ ' cm' if profile.height else 'Not specified' }}</p>
+
+                        <h5>Weight</h5>
+                        <p>{{ profile.weight ~ ' kg' if profile.weight else 'Not specified' }}</p>
+
+                        <h5>Dominant Foot</h5>
+                        <p>{{ profile.dominant_foot|capitalize if profile.dominant_foot else 'Not specified' }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h5>Bio</h5>
+                    <p>{{ profile.bio if profile.bio else 'No bio information available.' }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

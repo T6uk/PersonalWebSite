@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Update Match Result{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title">Update Match Result</h3>
+            </div>
+            <div class="card-body">
+                <h5 class="mb-3">{{ match.match_date.strftime('%B %d, %Y at %H:%M') }}</h5>
+
+                {% if match.is_home_game %}
+                    <h6 class="mb-3">FC Mara vs {{ match.opponent }} at {{ match.location }}</h6>
+                {% else %}
+                    <h6 class="mb-3">{{ match.opponent }} vs FC Mara at {{ match.location }}</h6>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('matches.update_result', match_id=match.id) }}">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-5 text-end">
+                            <h5>FC Mara</h5>
+                        </div>
+                        <div class="col-2 text-center">
+                            <h5>vs</h5>
+                        </div>
+                        <div class="col-5">
+                            <h5>{{ match.opponent }}</h5>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mb-4">
+                        <div class="col-5 text-end">
+                            <input type="number" name="score_team" class="form-control text-center"
+                                  value="{{ match.score_team or 0 }}" min="0" max="99" required>
+                        </div>
+                        <div class="col-2 text-center">
+                            <h5>-</h5>
+                        </div>
+                        <div class="col-5">
+                            <input type="number" name="score_opponent" class="form-control text-center"
+                                  value="{{ match.score_opponent or 0 }}" min="0" max="99" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Save Result</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

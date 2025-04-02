@@ -25,7 +25,7 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships - to be implemented when extending
-    # player_profile = db.relationship('PlayerProfile', backref='user', uselist=False, lazy=True)
+    player_profile = db.relationship('PlayerProfile', backref='user', uselist=False, lazy=True)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -44,3 +44,36 @@ class User(db.Model, UserMixin):
 
     def is_coach(self):
         return self.role == Role.COACH
+
+
+class PlayerProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
+    position = db.Column(db.String(20), default='midfielder')
+    jersey_number = db.Column(db.Integer, nullable=True)
+    height = db.Column(db.Integer, nullable=True)  # in cm
+    weight = db.Column(db.Integer, nullable=True)  # in kg
+    date_of_birth = db.Column(db.Date, nullable=True)
+    dominant_foot = db.Column(db.String(10), nullable=True)
+    bio = db.Column(db.Text, nullable=True)
+
+    # Remove this line as we already defined the relationship in User model
+    # user = db.relationship('User', backref='player_profile', uselist=False)
+
+    def __repr__(self):
+        return f'<PlayerProfile {self.user.username}>'
+
+
+class Match(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    opponent = db.Column(db.String(100), nullable=False)
+    match_date = db.Column(db.DateTime, nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    is_home_game = db.Column(db.Boolean, default=True)
+    score_team = db.Column(db.Integer, nullable=True)
+    score_opponent = db.Column(db.Integer, nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Match vs {self.opponent} on {self.match_date}>'

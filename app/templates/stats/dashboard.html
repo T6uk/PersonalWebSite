@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Team Statistics{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">FC Mara Team Statistics</h1>
+
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary mb-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Total Matches</h5>
+                            <h2 class="display-4">{{ total_matches }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success mb-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Win Percentage</h5>
+                            <h2 class="display-4">{{ win_percentage }}%</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-info mb-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Goals Scored</h5>
+                            <h2 class="display-4">{{ goals_scored }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-secondary mb-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Total Players</h5>
+                            <h2 class="display-4">{{ total_players }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results and Positions Charts -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Match Results</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <div class="d-inline-block mx-3">
+                                    <span class="badge bg-success p-2">Wins: {{ wins }}</span>
+                                </div>
+                                <div class="d-inline-block mx-3">
+                                    <span class="badge bg-warning text-dark p-2">Draws: {{ draws }}</span>
+                                </div>
+                                <div class="d-inline-block mx-3">
+                                    <span class="badge bg-danger p-2">Losses: {{ losses }}</span>
+                                </div>
+                            </div>
+                            <canvas id="resultsChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Players by Position</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="positionsChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent and Upcoming Matches -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Recent Matches</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                {% for match in recent_matches %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ match.match_date.strftime('%b %d, %Y') }}</strong>:
+                                                {% if match.is_home_game %}
+                                                    FC Mara vs {{ match.opponent }}
+                                                {% else %}
+                                                    {{ match.opponent }} vs FC Mara
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                {% if match.score_team is not none and match.score_opponent is not none %}
+                                                    <span class="badge rounded-pill
+                                                {% if match.score_team > match.score_opponent %}bg-success
+                                                {% elif match.score_team == match.score_opponent %}bg-warning text-dark
+                                                {% else %}bg-danger{% endif %}">
+                                                {{ match.score_team }} - {{ match.score_opponent }}
+                                            </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">No Result</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">User Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Create and manage user accounts for players and coaches.</p>
+                                <div class="d-grid">
+                                    <a href="{{ url_for('admin.create_user') }}" class="btn btn-primary">Create New
+                                        User</a>
+                                </div>
+                                <div class="d-grid mt-2">
+                                    <a href="{{ url_for('admin.view_users') }}" class="btn btn-outline-primary">View All
+                                        Users</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">Match Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Schedule matches and update match results.</p>
+                                <div class="d-grid">
+                                    <a href="{{ url_for('matches.create_match') }}" class="btn btn-primary">Schedule
+                                        Match</a>
+                                </div>
+                                <div class="d-grid mt-2">
+                                    <a href="{{ url_for('matches.schedule') }}" class="btn btn-outline-primary">View
+                                        Schedule</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">Team Statistics</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>View team performance statistics and analytics.</p>
+                                <div class="d-grid">
+                                    <a href="{{ url_for('stats.dashboard') }}" class="btn btn-primary">View
+                                        Statistics</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Upcoming Matches</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                {% for match in upcoming_matches %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ match.match_date.strftime('%b %d, %Y') }}</strong>:
+                                                {% if match.is_home_game %}
+                                                    FC Mara vs {{ match.opponent }}
+                                                {% else %}
+                                                    {{ match.opponent }} vs FC Mara
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <span class="badge bg-info">{{ match.match_date.strftime('%H:%M') }}</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Results Chart
+            const resultsCtx = document.getElementById('resultsChart').getContext('2d');
+            const resultsChart = new Chart(resultsCtx, {
+                type: 'pie',
+                data: {
+                    labels: {{ results_data.labels|tojson }},
+                    datasets: [{
+                        data: {{ results_data.values|tojson }},
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.7)',
+                            'rgba(255, 193, 7, 0.7)',
+                            'rgba(220, 53, 69, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(220, 53, 69, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Positions Chart
+            const positionsCtx = document.getElementById('positionsChart').getContext('2d');
+            const positionsChart = new Chart(positionsCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ position_data.labels|tojson }},
+                    datasets: [{
+                        label: 'Number of Players',
+                        data: {{ position_data.values|tojson }},
+                        backgroundColor: 'rgba(26, 61, 124, 0.7)',
+                        borderColor: 'rgba(26, 61, 124, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

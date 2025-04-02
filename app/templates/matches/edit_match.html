@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Match{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title">Edit Match</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('matches.edit_match', match_id=match.id) }}">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.opponent.label(class="form-label") }}
+                        {% if form.opponent.errors %}
+                            {{ form.opponent(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.opponent.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.opponent(class="form-control") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.match_date.label(class="form-label") }}
+                        {% if form.match_date.errors %}
+                            {{ form.match_date(class="form-control is-invalid", type="datetime-local") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.match_date.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.match_date(class="form-control", type="datetime-local") }}
+                        {% endif %}
+                        <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM</small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.location.label(class="form-label") }}
+                        {% if form.location.errors %}
+                            {{ form.location(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.location.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.location(class="form-control") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        {{ form.is_home_game(class="form-check-input") }}
+                        {{ form.is_home_game.label(class="form-check-label") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes(class="form-control", rows=3) }}
+                    </div>
+
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

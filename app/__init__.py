@@ -37,6 +37,15 @@ def create_app(config_class=Config):
     from app.core import bp as core_bp
     app.register_blueprint(core_bp)
 
+    from app.players import bp as players_bp
+    app.register_blueprint(players_bp)
+
+    from app.matches import bp as matches_bp
+    app.register_blueprint(matches_bp)
+
+    from app.stats import bp as stats_bp
+    app.register_blueprint(stats_bp)
+
     # Create initial admin account if it doesn't exist
     with app.app_context():
         # Import models here to avoid circular imports

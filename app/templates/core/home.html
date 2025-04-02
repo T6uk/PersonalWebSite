@@ -3,39 +3,85 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="row mt-5">
-    <div class="col-md-8 offset-md-2 text-center">
-        <h1 class="display-4">Welcome to FC Mara</h1>
-        <p class="lead">Your complete football team management solution</p>
+    <div class="row mt-5">
+        <div class="col-md-8 offset-md-2 text-center">
+            <h1 class="display-4">Welcome to FC Mara</h1>
+            <p class="lead">Your complete football team management solution</p>
 
-        <div class="row mt-5">
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Team Management</h5>
-                        <p class="card-text">Easily manage team rosters, schedules, and performance metrics</p>
+            <div class="row mt-5">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Team Management</h5>
+                            <p class="card-text">Easily manage team rosters, schedules, and performance metrics</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Player Profiles</h5>
-                        <p class="card-text">Track individual player stats, progress, and development</p>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Player Profiles</h5>
+                            <p class="card-text">Track individual player stats, progress, and development</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Match Analysis</h5>
-                        <p class="card-text">Comprehensive match data and performance analytics</p>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Match Analysis</h5>
+                            <p class="card-text">Comprehensive match data and performance analytics</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Team Management</h5>
+                                <p class="card-text">Easily manage team rosters, schedules, and performance metrics</p>
+                                {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_coach()) %}
+                                    <div class="d-grid mt-3">
+                                        <a href="{{ url_for('players.list_players') }}" class="btn btn-sm btn-primary">Manage
+                                            Players</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Match Schedule</h5>
+                                <p class="card-text">View upcoming matches and check past results</p>
+                                {% if current_user.is_authenticated %}
+                                    <div class="d-grid mt-3">
+                                        <a href="{{ url_for('matches.schedule') }}" class="btn btn-sm btn-primary">View
+                                            Schedule</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Team Statistics</h5>
+                                <p class="card-text">Comprehensive team data and performance analytics</p>
+                                {% if current_user.is_authenticated %}
+                                    <div class="d-grid mt-3">
+                                        <a href="{{ url_for('stats.dashboard') }}" class="btn btn-sm btn-primary">View
+                                            Stats</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

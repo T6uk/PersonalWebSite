@@ -24,10 +24,29 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('core.about') }}">About</a>
                 </li>
-                {% if current_user.is_authenticated and current_user.is_admin() %}
+                {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a>
+                        <a class="nav-link" href="{{ url_for('matches.schedule') }}">Match Schedule</a>
                     </li>
+                    {% if current_user.is_coach() or current_user.is_admin() %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('players.list_players') }}">Players</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('stats.dashboard') }}">Team Stats</a>
+                    </li>
+                    {% if current_user.is_player() %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('players.player_profile', user_id=current_user.id) }}">My
+                                Profile</a>
+                        </li>
+                    {% endif %}
+                    {% if current_user.is_admin() %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a>
+                        </li>
+                    {% endif %}
                 {% endif %}
             </ul>
             <ul class="navbar-nav">
