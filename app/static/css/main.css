@@ -1,0 +1,72 @@
+/* Custom styles for FC Mara website */
+
+/* Main theme colors */
+:root {
+    --primary-color: #1a3d7c;
+    --secondary-color: #e63946;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+}
+
+/* Navbar customization */
+.navbar-dark.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+/* Footer customization */
+footer {
+    margin-top: 3rem;
+    padding: 2rem 0;
+    background-color: var(--light-color);
+    border-top: 1px solid #dee2e6;
+}
+
+/* Card customization */
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #0f2a5c;
+    border-color: #0f2a5c;
+}
+
+/* Page spacing */
+.content-section {
+    padding: 2rem 0;
+}
+
+/* Profile sections */
+.profile-section {
+    margin-bottom: 2rem;
+}
+
+/* Team colors */
+.team-color-primary {
+    color: var(--primary-color);
+}
+
+.team-color-secondary {
+    color: var(--secondary-color);
+}
+
+/* Table customization */
+.table-hover tbody tr:hover {
+    background-color: rgba(26, 61, 124, 0.1);
+}

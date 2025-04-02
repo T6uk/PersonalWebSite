@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Environment variables
+.env
+
+# Virtual Environment
+venv/
+env/
+
+# Database
+*.db
+*.sqlite
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Migrations
+migrations/versions/
