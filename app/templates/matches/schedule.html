@@ -3,43 +3,63 @@
 {% block title %}Match Schedule{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Match Schedule</h1>
-                {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_coach()) %}
-                    <a href="{{ url_for('matches.create_match') }}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-1"></i> Schedule New Match
-                    </a>
-                {% endif %}
-            </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Match Schedule</h1>
+            {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_coach()) %}
+                <a href="{{ url_for('matches.create_match') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Schedule New Match
+                </a>
+            {% endif %}
+        </div>
 
-            <!-- Match schedule controls -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body py-3">
-                    <div class="row g-2 align-items-center">
-                        <div class="col-md-6">
-                            <div class="btn-group" role="group" aria-label="Match filter">
-                                <button type="button" class="btn btn-outline-primary active" id="showAll">All Matches
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" id="showUpcoming">Upcoming Only
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" id="showPast">Past Only</button>
-                            </div>
+        <!-- Match schedule controls -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body py-3">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-4">
+                        <div class="btn-group" role="group" aria-label="Match filter">
+                            <button type="button" class="btn btn-outline-primary active" id="showAll">All Matches</button>
+                            <button type="button" class="btn btn-outline-primary" id="showUpcoming">Upcoming Only</button>
+                            <button type="button" class="btn btn-outline-primary" id="showPast">Past Only</button>
                         </div>
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="matchSearch"
-                                       placeholder="Search by opponent...">
-                                <button class="btn btn-outline-secondary" type="button">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="typeFilter">
+                            <option value="all" selected>All Types</option>
+                            <option value="friendly">Friendly</option>
+                            <option value="league">League</option>
+                            <option value="tournament">Tournament</option>
+                            <option value="cup">Cup</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="matchSearch" placeholder="Search matches...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Calendar View Toggle -->
+        <div class="mb-4">
+            <div class="btn-group w-100" role="group" aria-label="View options">
+                <button type="button" class="btn btn-outline-primary active" id="listViewBtn">
+                    <i class="bi bi-list-ul me-1"></i> List View
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="calendarViewBtn">
+                    <i class="bi bi-calendar3 me-1"></i> Calendar View
+                </button>
+            </div>
+        </div>
+
+        <!-- List View -->
+        <div id="listView">
             <!-- Upcoming Matches -->
             <div id="upcomingMatchesSection" class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -49,69 +69,69 @@
                 <div class="card-body">
                     {% if upcoming_matches %}
                         <div class="table-responsive">
-                            <table class="table table-hover match-table">
+                            <table class="table table-hover match-table table-sortable">
                                 <thead>
-                                <tr>
-                                    <th style="width: 20%">Date</th>
-                                    <th style="width: 30%">Match</th>
-                                    <th style="width: 20%">Location</th>
-                                    <th style="width: 15%">Type</th>
-                                    {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_coach()) %}
-                                        <th style="width: 15%">Actions</th>
-                                    {% endif %}
-                                </tr>
+                                    <tr>
+                                        <th data-sort>Date</th>
+                                        <th>Match</th>
+                                        <th>Location</th>
+                                        <th>Type</th>
+                                        <th>Home/Away</th>
+                                        <th>Actions</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                {% for match in upcoming_matches %}
-                                    <tr>
-                                        <td>
-                                            <div class="fw-bold">{{ match.match_date.strftime('%b %d, %Y') }}</div>
-                                            <small class="text-muted">{{ match.match_date.strftime('%H:%M') }}</small>
-                                        </td>
-                                        <td>
-                                            {% if match.is_home_game %}
-                                                <span class="fw-bold team-color-primary">FC Mara</span> vs
-                                                <span class="team-color-secondary">{{ match.opponent }}</span>
-                                            {% else %}
-                                                <span class="team-color-secondary">{{ match.opponent }}</span> vs
-                                                <span class="fw-bold team-color-primary">FC Mara</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ match.location }}</td>
-                                        <td>
-                                            {% if match.is_home_game %}
-                                                <span class="badge bg-primary">Home</span>
-                                            {% else %}
-                                                <span class="badge bg-secondary">Away</span>
-                                            {% endif %}
-                                        </td>
-                                        {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_coach()) %}
+                                    {% for match in upcoming_matches %}
+                                        <tr data-match-type="{{ match.match_type }}">
+                                            <td>
+                                                <div class="fw-bold">{{ match.match_date.strftime('%b %d, %Y') }}</div>
+                                                <small class="text-muted">{{ match.match_date.strftime('%H:%M') }}</small>
+                                                <div class="countdown" data-date="{{ match.match_date.isoformat() }}"></div>
+                                            </td>
+                                            <td>
+                                                {% if match.is_home_game %}
+                                                    <span class="fw-bold team-color-primary">FC Mara</span> vs
+                                                    <span class="team-color-secondary">{{ match.opponent }}</span>
+                                                {% else %}
+                                                    <span class="team-color-secondary">{{ match.opponent }}</span> vs
+                                                    <span class="fw-bold team-color-primary">FC Mara</span>
+                                                {% endif %}
+                                                {% if match.tournament_name %}
+                                                    <div><small class="text-muted">{{ match.tournament_name }}</small></div>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ match.location }}</td>
+                                            <td>
+                                                <span class="badge
+                                                    {% if match.match_type == 'friendly' %}bg-secondary
+                                                    {% elif match.match_type == 'league' %}bg-success
+                                                    {% elif match.match_type == 'tournament' %}bg-info
+                                                    {% elif match.match_type == 'cup' %}bg-primary
+                                                    {% endif %}">
+                                                    {{ match.match_type|capitalize }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if match.is_home_game %}
+                                                    <span class="badge bg-primary">Home</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Away</span>
+                                                {% endif %}
+                                            </td>
                                             <td>
                                                 <div class="btn-group btn-group-sm">
-                                                    <a href="{{ url_for('matches.match_details', match_id=match.id) }}"
-                                                       class="btn btn-info">
+                                                    <a href="{{ url_for('matches.match_details', match_id=match.id) }}" class="btn btn-info" data-bs-toggle="tooltip" title="View Details">
                                                         <i class="bi bi-info-circle"></i>
                                                     </a>
-                                                    <a href="{{ url_for('matches.edit_match', match_id=match.id) }}"
-                                                       class="btn btn-outline-primary">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <a href="{{ url_for('matches.update_result', match_id=match.id) }}"
-                                                       class="btn btn-outline-success">
-                                                        <i class="bi bi-trophy"></i>
-                                                    </a>
+                                                    {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_coach()) %}
+                                                        <a href="{{ url_for('matches.edit_match', match_id=match.id) }}" class="btn btn-outline-primary" data-bs-toggle="tooltip" title="Edit Match">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </a>
+                                                    {% endif %}
                                                 </div>
                                             </td>
-                                        {% else %}
-                                            <td>
-                                                <a href="{{ url_for('matches.match_details', match_id=match.id) }}"
-                                                   class="btn btn-sm btn-info">
-                                                    <i class="bi bi-info-circle me-1"></i> Details
-                                                </a>
-                                            </td>
-                                        {% endif %}
-                                    </tr>
-                                {% endfor %}
+                                        </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -138,73 +158,78 @@
                 <div class="card-body">
                     {% if past_matches %}
                         <div class="table-responsive">
-                            <table class="table table-hover match-table">
+                            <table class="table table-hover match-table table-sortable">
                                 <thead>
-                                <tr>
-                                    <th style="width: 20%">Date</th>
-                                    <th style="width: 30%">Match</th>
-                                    <th style="width: 15%">Result</th>
-                                    <th style="width: 20%">Location</th>
-                                    {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_coach()) %}
-                                        <th style="width: 15%">Actions</th>
-                                    {% endif %}
-                                </tr>
+                                    <tr>
+                                        <th data-sort>Date</th>
+                                        <th>Match</th>
+                                        <th>Result</th>
+                                        <th>Type</th>
+                                        <th>Location</th>
+                                        <th>Actions</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                {% for match in past_matches %}
-                                    <tr>
-                                        <td>
-                                            <div class="fw-bold">{{ match.match_date.strftime('%b %d, %Y') }}</div>
-                                        </td>
-                                        <td>
-                                            {% if match.is_home_game %}
-                                                <span class="fw-bold team-color-primary">FC Mara</span> vs
-                                                <span class="team-color-secondary">{{ match.opponent }}</span>
-                                            {% else %}
-                                                <span class="team-color-secondary">{{ match.opponent }}</span> vs
-                                                <span class="fw-bold team-color-primary">FC Mara</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if match.score_team is not none and match.score_opponent is not none %}
-                                                <span class="badge rounded-pill
-                                                {% if match.score_team > match.score_opponent %}bg-success
-                                                {% elif match.score_team == match.score_opponent %}bg-warning text-dark
-                                                {% else %}bg-danger{% endif %}">
-                                                    {{ match.score_team }} - {{ match.score_opponent }}
+                                    {% for match in past_matches %}
+                                        <tr data-match-type="{{ match.match_type }}">
+                                            <td>
+                                                <div class="fw-bold">{{ match.match_date.strftime('%b %d, %Y') }}</div>
+                                                <small class="text-muted">{{ match.match_date.strftime('%H:%M') }}</small>
+                                            </td>
+                                            <td>
+                                                {% if match.is_home_game %}
+                                                    <span class="fw-bold team-color-primary">FC Mara</span> vs
+                                                    <span class="team-color-secondary">{{ match.opponent }}</span>
+                                                {% else %}
+                                                    <span class="team-color-secondary">{{ match.opponent }}</span> vs
+                                                    <span class="fw-bold team-color-primary">FC Mara</span>
+                                                {% endif %}
+                                                {% if match.tournament_name %}
+                                                    <div><small class="text-muted">{{ match.tournament_name }}</small></div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if match.score_team is not none and match.score_opponent is not none %}
+                                                    <span class="badge rounded-pill
+                                                    {% if match.score_team > match.score_opponent %}bg-success
+                                                    {% elif match.score_team == match.score_opponent %}bg-warning text-dark
+                                                    {% else %}bg-danger{% endif %}">
+                                                        {{ match.score_team }} - {{ match.score_opponent }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">No Result</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge
+                                                    {% if match.match_type == 'friendly' %}bg-secondary
+                                                    {% elif match.match_type == 'league' %}bg-success
+                                                    {% elif match.match_type == 'tournament' %}bg-info
+                                                    {% elif match.match_type == 'cup' %}bg-primary
+                                                    {% endif %}">
+                                                    {{ match.match_type|capitalize }}
                                                 </span>
-                                            {% else %}
-                                                <span class="badge bg-secondary">No Result</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ match.location }}</td>
-                                        {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_coach()) %}
+                                            </td>
+                                            <td>{{ match.location }}</td>
                                             <td>
                                                 <div class="btn-group btn-group-sm">
-                                                    <a href="{{ url_for('matches.match_details', match_id=match.id) }}"
-                                                       class="btn btn-info">
+                                                    <a href="{{ url_for('matches.match_details', match_id=match.id) }}" class="btn btn-info" data-bs-toggle="tooltip" title="View Details">
                                                         <i class="bi bi-info-circle"></i>
                                                     </a>
-                                                    <a href="{{ url_for('matches.edit_match', match_id=match.id) }}"
-                                                       class="btn btn-outline-primary">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <a href="{{ url_for('matches.update_result', match_id=match.id) }}"
-                                                       class="btn btn-outline-success">
-                                                        <i class="bi bi-trophy"></i>
-                                                    </a>
+                                                    {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_coach()) %}
+                                                        <a href="{{ url_for('matches.edit_match', match_id=match.id) }}" class="btn btn-outline-primary" data-bs-toggle="tooltip" title="Edit Match">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </a>
+                                                        {% if match.score_team is none or match.score_opponent is none %}
+                                                            <a href="{{ url_for('matches.update_result', match_id=match.id) }}" class="btn btn-outline-success" data-bs-toggle="tooltip" title="Update Result">
+                                                                <i class="bi bi-trophy"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endif %}
                                                 </div>
                                             </td>
-                                        {% else %}
-                                            <td>
-                                                <a href="{{ url_for('matches.match_details', match_id=match.id) }}"
-                                                   class="btn btn-sm btn-info">
-                                                    <i class="bi bi-info-circle me-1"></i> Details
-                                                </a>
-                                            </td>
-                                        {% endif %}
-                                    </tr>
-                                {% endfor %}
+                                        </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -217,66 +242,332 @@
                 </div>
             </div>
         </div>
+
+        <!-- Calendar View -->
+        <div id="calendarView" class="card shadow-sm" style="display: none;">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">Match Calendar</h4>
+            </div>
+            <div class="card-body">
+                <div id="matchCalendar" class="mb-4">
+                    <!-- Calendar will be rendered here by JavaScript -->
+                </div>
+                <div id="calendarLegend" class="d-flex flex-wrap justify-content-center gap-3 mt-3">
+                    <div><span class="badge bg-primary me-1">●</span> Home Match</div>
+                    <div><span class="badge bg-secondary me-1">●</span> Away Match</div>
+                    <div><span class="badge bg-success me-1">●</span> League</div>
+                    <div><span class="badge bg-info me-1">●</span> Tournament</div>
+                    <div><span class="badge bg-primary me-1">●</span> Cup</div>
+                    <div><span class="badge bg-secondary me-1">●</span> Friendly</div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Filter buttons
-            const showAllBtn = document.getElementById('showAll');
-            const showUpcomingBtn = document.getElementById('showUpcoming');
-            const showPastBtn = document.getElementById('showPast');
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter buttons
+    const showAllBtn = document.getElementById('showAll');
+    const showUpcomingBtn = document.getElementById('showUpcoming');
+    const showPastBtn = document.getElementById('showPast');
 
-            const upcomingSection = document.getElementById('upcomingMatchesSection');
-            const pastSection = document.getElementById('pastMatchesSection');
+    const upcomingSection = document.getElementById('upcomingMatchesSection');
+    const pastSection = document.getElementById('pastMatchesSection');
 
-            showAllBtn.addEventListener('click', function () {
-                showAllBtn.classList.add('active');
-                showUpcomingBtn.classList.remove('active');
-                showPastBtn.classList.remove('active');
+    showAllBtn.addEventListener('click', function() {
+        showAllBtn.classList.add('active');
+        showUpcomingBtn.classList.remove('active');
+        showPastBtn.classList.remove('active');
 
-                upcomingSection.style.display = 'block';
-                pastSection.style.display = 'block';
-            });
+        upcomingSection.style.display = 'block';
+        pastSection.style.display = 'block';
+    });
 
-            showUpcomingBtn.addEventListener('click', function () {
-                showAllBtn.classList.remove('active');
-                showUpcomingBtn.classList.add('active');
-                showPastBtn.classList.remove('active');
+    showUpcomingBtn.addEventListener('click', function() {
+        showAllBtn.classList.remove('active');
+        showUpcomingBtn.classList.add('active');
+        showPastBtn.classList.remove('active');
 
-                upcomingSection.style.display = 'block';
-                pastSection.style.display = 'none';
-            });
+        upcomingSection.style.display = 'block';
+        pastSection.style.display = 'none';
+    });
 
-            showPastBtn.addEventListener('click', function () {
-                showAllBtn.classList.remove('active');
-                showUpcomingBtn.classList.remove('active');
-                showPastBtn.classList.add('active');
+    showPastBtn.addEventListener('click', function() {
+        showAllBtn.classList.remove('active');
+        showUpcomingBtn.classList.remove('active');
+        showPastBtn.classList.add('active');
 
-                upcomingSection.style.display = 'none';
-                pastSection.style.display = 'block';
-            });
+        upcomingSection.style.display = 'none';
+        pastSection.style.display = 'block';
+    });
 
-            // Search functionality
-            const searchInput = document.getElementById('matchSearch');
-            const allRows = document.querySelectorAll('.match-table tbody tr');
+    // Match type filter
+    const typeFilter = document.getElementById('typeFilter');
+    const matchRows = document.querySelectorAll('.match-table tbody tr');
 
-            searchInput.addEventListener('input', function () {
-                const searchTerm = this.value.toLowerCase().trim();
+    typeFilter.addEventListener('change', function() {
+        const selectedType = this.value;
 
-                allRows.forEach(row => {
-                    const opponent = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                    const location = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-
-                    if (opponent.includes(searchTerm) || location.includes(searchTerm)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            });
+        matchRows.forEach(row => {
+            if (selectedType === 'all' || row.dataset.matchType === selectedType) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
         });
-    </script>
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('matchSearch');
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+
+        matchRows.forEach(row => {
+            const opponent = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const location = row.cells[row.cells.length - 2].textContent.toLowerCase();
+            const matchType = row.dataset.matchType.toLowerCase();
+
+            if (opponent.includes(searchTerm) || location.includes(searchTerm) || matchType.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // View toggle
+    const listViewBtn = document.getElementById('listViewBtn');
+    const calendarViewBtn = document.getElementById('calendarViewBtn');
+    const listView = document.getElementById('listView');
+    const calendarView = document.getElementById('calendarView');
+
+    listViewBtn.addEventListener('click', function() {
+        listViewBtn.classList.add('active');
+        calendarViewBtn.classList.remove('active');
+        listView.style.display = 'block';
+        calendarView.style.display = 'none';
+    });
+
+    calendarViewBtn.addEventListener('click', function() {
+        listViewBtn.classList.remove('active');
+        calendarViewBtn.classList.add('active');
+        listView.style.display = 'none';
+        calendarView.style.display = 'block';
+        renderCalendar();
+    });
+
+    // Countdown timers for upcoming matches
+    const countdowns = document.querySelectorAll('.countdown');
+    countdowns.forEach(countdown => {
+        const matchDate = new Date(countdown.dataset.date);
+        updateCountdown(countdown, matchDate);
+
+        // Update every minute
+        setInterval(() => {
+            updateCountdown(countdown, matchDate);
+        }, 60000);
+    });
+
+    function updateCountdown(element, targetDate) {
+        const now = new Date();
+        const diff = targetDate - now;
+
+        if (diff <= 0) {
+            element.innerHTML = '<span class="badge bg-danger">Match Started</span>';
+            return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+        if (days > 7) {
+            // Don't show countdown if more than a week away
+            return;
+        }
+
+        let countdownText = '';
+        if (days > 0) {
+            countdownText = `<span class="badge bg-info">${days} day${days !== 1 ? 's' : ''} to go</span>`;
+        } else {
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            countdownText = `<span class="badge bg-warning text-dark">${hours} hour${hours !== 1 ? 's' : ''} to go</span>`;
+        }
+
+        element.innerHTML = countdownText;
+    }
+
+    // Simple calendar visualization
+    function renderCalendar() {
+        const calendarContainer = document.getElementById('matchCalendar');
+        const today = new Date();
+        const currentMonth = today.getMonth();
+        const currentYear = today.getFullYear();
+
+        // Get all match dates from both upcoming and past matches
+        const matchDates = [...document.querySelectorAll('.match-table tbody tr')].map(row => {
+            const dateCell = row.querySelector('td:first-child');
+            const dateText = dateCell.firstElementChild.textContent;
+            const timeText = dateCell.querySelector('small').textContent;
+
+            // Parse date and create a match object
+            const dateParts = dateText.split(' ');
+            const month = getMonthNumber(dateParts[0]);
+            const day = parseInt(dateParts[1].replace(',', ''));
+            const year = parseInt(dateParts[2]);
+
+            // Check if this is a home or away match
+            const isHome = row.querySelector('td:nth-child(5)') ?
+                           row.querySelector('td:nth-child(5)').textContent.trim() === 'Home' :
+                           row.querySelector('td:nth-child(2)').textContent.includes('FC Mara vs');
+
+            // Get match type
+            const matchType = row.dataset.matchType;
+
+            // Get opponent
+            const opponent = row.querySelector('td:nth-child(2)').textContent.split('vs')[
+                isHome ? 1 : 0
+            ].trim();
+
+            return {
+                date: new Date(year, month, day),
+                isHome: isHome,
+                type: matchType,
+                opponent: opponent
+            };
+        });
+
+        // Generate calendar HTML
+        let calendarHTML = '';
+
+        // Generate 3-month view (previous, current, next)
+        for (let monthOffset = -1; monthOffset <= 1; monthOffset++) {
+            const displayMonth = new Date(currentYear, currentMonth + monthOffset, 1);
+            const year = displayMonth.getFullYear();
+            const month = displayMonth.getMonth();
+
+            calendarHTML += generateMonthCalendar(year, month, matchDates);
+        }
+
+        calendarContainer.innerHTML = calendarHTML;
+    }
+
+    function generateMonthCalendar(year, month, matchDates) {
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const monthName = firstDay.toLocaleString('default', { month: 'long' });
+
+        let calendarHTML = `
+            <div class="calendar-month mb-4">
+                <h3 class="text-center mb-3">${monthName} ${year}</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sun</th>
+                                <th>Mon</th>
+                                <th>Tue</th>
+                                <th>Wed</th>
+                                <th>Thu</th>
+                                <th>Fri</th>
+                                <th>Sat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+
+        // Get the day of the week for the first day (0 = Sunday, 6 = Saturday)
+        let dayOfWeek = firstDay.getDay();
+
+        // Start a new row
+        calendarHTML += '<tr>';
+
+        // Add empty cells for days before the first of the month
+        for (let i = 0; i < dayOfWeek; i++) {
+            calendarHTML += '<td></td>';
+        }
+
+        // Add cells for each day of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+
+            // Find matches for this day
+            const dayMatches = matchDates.filter(match =>
+                match.date.getFullYear() === year &&
+                match.date.getMonth() === month &&
+                match.date.getDate() === day
+            );
+
+            // Determine if this day is today
+            const isToday = date.setHours(0,0,0,0) === new Date().setHours(0,0,0,0);
+
+            // Start the cell with appropriate classes
+            calendarHTML += `<td class="${isToday ? 'bg-light' : ''} position-relative" style="height: 100px; vertical-align: top;">
+                <div class="fw-bold">${day}</div>`;
+
+            // Add match indicators
+            dayMatches.forEach(match => {
+                let badgeClass = '';
+                if (match.type === 'league') badgeClass = 'bg-success';
+                else if (match.type === 'tournament') badgeClass = 'bg-info';
+                else if (match.type === 'cup') badgeClass = 'bg-primary';
+                else badgeClass = 'bg-secondary'; // friendly
+
+                // Add border for home (solid) vs away (dashed)
+                const borderStyle = match.isHome ? 'border-style: solid;' : 'border-style: dashed;';
+
+                calendarHTML += `
+                    <div class="small mt-1 p-1 rounded text-white ${badgeClass}" style="${borderStyle}">
+                        vs ${match.opponent}
+                    </div>
+                `;
+            });
+
+            // Close the cell
+            calendarHTML += '</td>';
+
+            // If it's Saturday, end the row and start a new one
+            if ((dayOfWeek + day) % 7 === 0) {
+                calendarHTML += '</tr>';
+                if (day < daysInMonth) {
+                    calendarHTML += '<tr>';
+                }
+            }
+        }
+
+        // Add empty cells for days after the last day of the month
+        const remainingCells = 7 - ((dayOfWeek + daysInMonth) % 7);
+        if (remainingCells < 7) {
+            for (let i = 0; i < remainingCells; i++) {
+                calendarHTML += '<td></td>';
+            }
+        }
+
+        // Close the last row
+        calendarHTML += '</tr>';
+
+        // Close the table
+        calendarHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        return calendarHTML;
+    }
+
+    function getMonthNumber(monthName) {
+        const months = {
+            'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+            'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+        };
+        return months[monthName];
+    }
+});
+</script>
 {% endblock %}

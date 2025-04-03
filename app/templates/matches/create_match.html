@@ -4,78 +4,99 @@
 {% block title %}Schedule Match{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8 offset-md-2">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h3 class="card-title mb-0">Schedule New Match</h3>
-                <i class="bi bi-calendar-plus"></i>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('matches.create_match') }}" class="needs-validation" novalidate>
-                    {{ form.hidden_tag() }}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">Schedule New Match</h3>
+                    <i class="bi bi-calendar-plus"></i>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('matches.create_match') }}" class="needs-validation"
+                          novalidate>
+                        {{ form.hidden_tag() }}
 
-                    <div class="row">
-                        <div class="col-md-8">
-                            {{ render_field(form.opponent) }}
+                        <div class="row">
+                            <div class="col-md-8">
+                                {{ render_field(form.opponent) }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ render_checkbox(form.is_home_game) }}
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            {{ render_checkbox(form.is_home_game) }}
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ render_field(form.match_date, type="datetime-local") }}
-                            <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM</small>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.match_date.label(class="form-label") }}
+                                    {% if form.match_date.errors %}
+                                        <input type="datetime-local"
+                                               name="match_date"
+                                               class="form-control is-invalid"
+                                               id="match_date"
+                                               required>
+                                        <div class="invalid-feedback">
+                                            {% for error in form.match_date.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <input type="datetime-local"
+                                               name="match_date"
+                                               class="form-control"
+                                               id="match_date"
+                                               required>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                {{ render_field(form.location) }}
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            {{ render_field(form.location) }}
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ render_field(form.match_type, field_class="form-select") }}
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ render_field(form.match_type, field_class="form-select") }}
+                            </div>
+                            <div class="col-md-6 tournament-field">
+                                {{ render_field(form.tournament_name) }}
+                            </div>
                         </div>
-                        <div class="col-md-6 tournament-field">
-                            {{ render_field(form.tournament_name) }}
+
+                        <div class="mb-3">
+                            {{ render_field(form.notes, rows="3") }}
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        {{ render_field(form.notes, rows="3") }}
-                    </div>
-
-                    {{ render_submit_button(form.submit) }}
-                </form>
+                        {{ render_submit_button(form.submit) }}
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
-{{ super() }}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const matchTypeSelect = document.getElementById('match_type');
-    const tournamentField = document.querySelector('.tournament-field');
+    {{ super() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const matchTypeSelect = document.getElementById('match_type');
+            const tournamentField = document.querySelector('.tournament-field');
 
-    // Initial visibility
-    updateTournamentField();
+            // Initial visibility
+            updateTournamentField();
 
-    // Update on change
-    matchTypeSelect.addEventListener('change', updateTournamentField);
+            // Update on change
+            matchTypeSelect.addEventListener('change', updateTournamentField);
 
-    function updateTournamentField() {
-        if (matchTypeSelect.value === 'tournament' || matchTypeSelect.value === 'league' || matchTypeSelect.value === 'cup') {
-            tournamentField.style.display = 'block';
-        } else {
-            tournamentField.style.display = 'none';
-            document.getElementById('tournament_name').value = '';
-        }
-    }
-});
-</script>
+            function updateTournamentField() {
+                if (matchTypeSelect.value === 'tournament' || matchTypeSelect.value === 'league' || matchTypeSelect.value === 'cup') {
+                    tournamentField.style.display = 'block';
+                } else {
+                    tournamentField.style.display = 'none';
+                    document.getElementById('tournament_name').value = '';
+                }
+            }
+        });
+    </script>
 {% endblock %}

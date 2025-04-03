@@ -6,7 +6,7 @@ from app.models import MatchType
 
 class MatchForm(FlaskForm):
     opponent = StringField('Opponent Team', validators=[DataRequired(), Length(min=2, max=100)])
-    match_date = DateTimeField('Match Date & Time', format='%Y-%m-%d %H:%M', validators=[DataRequired()])
+    match_date = DateTimeField('Match Date & Time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
     location = StringField('Location', validators=[DataRequired(), Length(min=2, max=100)])
     is_home_game = BooleanField('Home Game')
     match_type = SelectField('Match Type', choices=[

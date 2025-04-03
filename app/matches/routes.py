@@ -32,6 +32,7 @@ def schedule():
 def create_match():
     form = MatchForm()
     if form.validate_on_submit():
+        # Create the match and handle the validated form data
         match = Match(
             opponent=form.opponent.data,
             match_date=form.match_date.data,
@@ -45,6 +46,9 @@ def create_match():
         db.session.commit()
         flash('Match added to schedule!', 'success')
         return redirect(url_for('matches.schedule'))
+    elif request.method == 'POST':
+        # In case of errors, log for debugging
+        print(f"Form errors: {form.errors}")
 
     return render_template('matches/create_match.html',
                            title='Schedule Match',
