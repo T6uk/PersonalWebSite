@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>League</h1>
+
+        {% if seasons %}
+        <div class="d-flex align-items-center">
+            <label for="seasonSelect" class="me-2">Season:</label>
+            <select id="seasonSelect" class="form-select" onchange="window.location.href='{{ url_for('public.league') }}?season=' + this.value">
+                {% for season in seasons %}
+                <option value="{{ season }}" {% if season == selected_season %}selected{% endif %}>{{ season }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- League Stats Summary -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Season Statistics</h5>
+                </div>
+                <div class="card-body">
+                    {% if team_stats %}
+                        <div class="row text-center">
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body">
+                                        <h6 class="text-muted mb-2">Games Played</h6>
+                                        <h2 class="mb-0">{{ team_stats.total_games }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-primary text-white h-100">
+                                    <div class="card-body">
+                                        <h6 class="text-white-50 mb-2">Points</h6>
+                                        <h2 class="mb-0">{{ team_stats.points }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-success text-white h-100">
+                                    <div class="card-body">
+                                        <h6 class="text-white-50 mb-2">Wins</h6>
+                                        <h2 class="mb-0">{{ team_stats.wins }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-info text-white h-100">
+                                    <div class="card-body">
+                                        <h6 class="text-white-50 mb-2">Draws</h6>
+                                        <h2 class="mb-0">{{ team_stats.draws }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row text-center mt-3">
+                            <div class="col-md-3 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="text-muted mb-2">Losses</h6>
+                                        <h2 class="mb-0">{{ team_stats.losses }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="text-muted mb-2">Goals For</h6>
+                                        <h2 class="mb-0">{{ team_stats.goals_for }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="text-muted mb-2">Goals Against</h6>
+                                        <h2 class="mb-0">{{ team_stats.goals_against }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="text-muted mb-2">Goal Difference</h6>
+                                        <h2 class="mb-0">{{ team_stats.goal_difference }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-0">No league statistics available for this season</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Top Scorers</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if top_scorers %}
+                        <div class="list-group list-group-flush">
+                            {% for player, goals in top_scorers %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="bg-primary rounded-circle text-white fw-bold d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                {{ loop.index }}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ player.full_name }}</h6>
+                                            <small class="text-muted">{{ player.position }}</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill fs-6">{{ goals }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center p-4">
+                            <p class="text-muted mb-0">No player statistics available</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- League Events and Games -->
+    {% if events %}
+        {% for event in events %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{{ event.name }}</h4>
+                </div>
+                <div class="card-body p-0">
+                    {% set event_games = [g for g in games if g.event_id == event.id] %}
+
+                    {% if event_games %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Match</th>
+                                        <th>Result</th>
+                                        <th>Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in event_games %}
+                                        <tr>
+                                            <td>{{ game.date.strftime('%d %b %Y') }}</td>
+                                            <td>
+                                                {% if game.is_home_game %}
+                                                    <strong>Our Team</strong> vs {{ game.opponent }}
+                                                {% else %}
+                                                    {{ game.opponent }} vs <strong>Our Team</strong>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if game.status == 'completed' %}
+                                                    <span class="fw-bold">{{ game.score_team }} - {{ game.score_opponent }}</span>
+                                                    <span class="badge
+                                                        {% if game.result == 'win' %}bg-success
+                                                        {% elif game.result == 'loss' %}bg-danger
+                                                        {% else %}bg-secondary{% endif %} ms-2">
+                                                        {{ game.result|capitalize }}
+                                                    </span>
+                                                {% elif game.status == 'upcoming' %}
+                                                    <span class="badge bg-warning text-dark">Upcoming</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ game.status|capitalize }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ game.location if game.location else '-' }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-0">No games available for this event</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-calendar2-x display-1 text-muted"></i>
+                </div>
+                <h5>No League Events Found</h5>
+                <p class="text-muted">There are no league events for the selected season.</p>
+
+                {% if seasons and seasons|length > 1 %}
+                    <div class="mt-3">
+                        <p>Try selecting a different season:</p>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            {% for season in seasons %}
+                                {% if season != selected_season %}
+                                    <a href="{{ url_for('public.league', season=season) }}" class="btn btn-outline-primary">{{ season }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

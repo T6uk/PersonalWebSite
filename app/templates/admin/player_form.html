@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{% if player %}Edit Player{% else %}Add New Player{% endif %}</h1>
+        <a href="{{ url_for('admin.players') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Players
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Player Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                <div class="row g-3">
+                    <!-- Personal Information -->
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else ""), placeholder="First Name") }}
+                            {{ form.first_name.label }}
+                            {% if form.first_name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.first_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else ""), placeholder="Last Name") }}
+                            {{ form.last_name.label }}
+                            {% if form.last_name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.last_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.position(class="form-control" + (" is-invalid" if form.position.errors else ""), placeholder="Position") }}
+                            {{ form.position.label }}
+                            {% if form.position.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.position.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">E.g., Goalkeeper, Defender, Midfielder, Forward</small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.jersey_number(class="form-control" + (" is-invalid" if form.jersey_number.errors else ""), placeholder="Jersey Number") }}
+                            {{ form.jersey_number.label }}
+                            {% if form.jersey_number.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.jersey_number.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            {{ form.date_of_birth(class="form-control" + (" is-invalid" if form.date_of_birth.errors else ""), type="date", placeholder="Date of Birth") }}
+                            {{ form.date_of_birth.label }}
+                            {% if form.date_of_birth.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.date_of_birth.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            {{ form.height(class="form-control" + (" is-invalid" if form.height.errors else ""), placeholder="Height (cm)") }}
+                            {{ form.height.label }}
+                            {% if form.height.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.height.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            {{ form.weight(class="form-control" + (" is-invalid" if form.weight.errors else ""), placeholder="Weight (kg)") }}
+                            {{ form.weight.label }}
+                            {% if form.weight.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.weight.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.nationality(class="form-control" + (" is-invalid" if form.nationality.errors else ""), placeholder="Nationality") }}
+                            {{ form.nationality.label }}
+                            {% if form.nationality.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.nationality.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.image.label }}</label>
+                            {{ form.image(class="form-control" + (" is-invalid" if form.image.errors else "")) }}
+                            {% if form.image.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.image.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">Upload player's photo (jpg, jpeg, png)</small>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.bio.label }}</label>
+                            {{ form.bio(class="form-control" + (" is-invalid" if form.bio.errors else ""), rows=4) }}
+                            {% if form.bio.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.bio.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">Brief biography of the player</small>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check form-switch mb-3">
+                            {{ form.is_active(class="form-check-input") }}
+                            {{ form.is_active.label(class="form-check-label") }}
+                        </div>
+                    </div>
+
+                    {% if player %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Current Image</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    {% if player.image_url %}
+                                        <img src="{{ player.image_url }}" alt="{{ player.full_name }}" class="img-fluid rounded" style="max-height: 150px;">
+                                    {% else %}
+                                        <div class="bg-secondary text-white rounded p-3">
+                                            <i class="bi bi-person-bounding-box display-4"></i>
+                                            <p class="mb-0 mt-2">No image</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end">
+                    <a href="{{ url_for('admin.players') }}" class="btn btn-outline-secondary me-2">Cancel</a>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Players</h1>
+
+        {% if positions %}
+        <div class="d-flex align-items-center">
+            <label for="positionSelect" class="me-2">Position:</label>
+            <select id="positionSelect" class="form-select" onchange="window.location.href='{{ url_for('public.players') }}?position=' + this.value">
+                <option value="all" {% if selected_position == 'all' %}selected{% endif %}>All Positions</option>
+                {% for position in positions %}
+                <option value="{{ position }}" {% if position == selected_position %}selected{% endif %}>{{ position }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if players %}
+        <div class="row g-4">
+            {% for player in players %}
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <a href="{{ url_for('public.player_detail', player_id=player.id) }}" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm player-card">
+                            <div class="card-img-top bg-light pt-3 px-3">
+                                <div class="text-center">
+                                    {% if player.image_url %}
+                                        <img src="{{ player.image_url }}" class="img-fluid rounded" alt="{{ player.full_name }}" style="max-height: 200px;">
+                                    {% else %}
+                                        <div class="ratio ratio-1x1 bg-secondary rounded-circle mx-auto" style="max-width: 180px;">
+                                            <div class="d-flex align-items-center justify-content-center text-white">
+                                                <span class="display-4">{{ player.first_name[0] }}{{ player.last_name[0] }}</span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ player.full_name }}</h5>
+                                <div class="d-flex justify-content-center gap-2 mb-2">
+                                    <span class="badge bg-primary">{{ player.position }}</span>
+                                    {% if player.jersey_number %}
+                                        <span class="badge bg-secondary">#{{ player.jersey_number }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if player.nationality %}
+                                    <p class="card-text text-muted">{{ player.nationality }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-white text-center border-top-0">
+                                <div class="btn btn-sm btn-outline-primary">View Profile</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-people display-1 text-muted"></i>
+                </div>
+                <h5>No Players Found</h5>
+                <p class="text-muted">No players match the selected criteria.</p>
+
+                {% if selected_position != 'all' %}
+                    <a href="{{ url_for('public.players') }}" class="btn btn-primary mt-2">View All Players</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

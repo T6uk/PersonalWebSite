@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Trophy Cabinet</h1>
+
+    {% if trophy_years %}
+        <div class="row">
+            {% for year, year_trophies in trophy_years.items() %}
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">{{ year }}</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-4">
+                                {% for trophy in year_trophies %}
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="card h-100">
+                                            <div class="card-img-top bg-light pt-3 px-3">
+                                                <div class="text-center">
+                                                    {% if trophy.image_url %}
+                                                        <img src="{{ trophy.image_url }}" class="img-fluid rounded" alt="{{ trophy.name }}" style="max-height: 180px;">
+                                                    {% else %}
+                                                        <div class="py-4 text-center">
+                                                            <i class="bi bi-trophy-fill display-1 text-warning"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ trophy.name }}</h5>
+                                                <h6 class="card-subtitle mb-2 text-muted">{{ trophy.competition }}</h6>
+                                                {% if trophy.description %}
+                                                    <p class="card-text mt-3">{{ trophy.description }}</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-trophy display-1 text-muted"></i>
+                </div>
+                <h5>No Trophies Found</h5>
+                <p class="text-muted">There are no trophies available in the database.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Players</h1>
+        <a href="{{ url_for('admin.add_player') }}" class="btn btn-primary">
+            <i class="bi bi-person-plus me-2"></i>Add New Player
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">All Players</h5>
+            <span class="badge bg-secondary">{{ players|length }} Total</span>
+        </div>
+        <div class="card-body p-0">
+            {% if players %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Number</th>
+                            <th>Nationality</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in players %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        {% if player.image_url %}
+                                            <img src="{{ player.image_url }}" class="rounded-circle" width="40" height="40" alt="{{ player.full_name }}">
+                                        {% else %}
+                                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                {{ player.first_name[0] }}{{ player.last_name[0] }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ms-3">
+                                        <h6 class="mb-0">{{ player.full_name }}</h6>
+                                        {% if player.date_of_birth %}
+                                            <small class="text-muted">{{ (player.date_of_birth.today().year - player.date_of_birth.year) }} years</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ player.position }}</td>
+                            <td>{{ player.jersey_number if player.jersey_number else '-' }}</td>
+                            <td>{{ player.nationality if player.nationality else '-' }}</td>
+                            <td>
+                                {% if player.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a href="{{ url_for('admin.edit_player', player_id=player.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ player.id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal{{ player.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Confirm Deletion</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-start">
+                                                <p>Are you sure you want to delete <strong>{{ player.full_name }}</strong>?</p>
+                                                <p class="text-danger mb-0"><small>This action cannot be undone and will delete all statistics associated with this player.</small></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form action="{{ url_for('admin.delete_player', player_id=player.id) }}" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-people display-1 text-muted"></i>
+                </div>
+                <h5>No Players Found</h5>
+                <p class="text-muted">Get started by adding your first player.</p>
+                <a href="{{ url_for('admin.add_player') }}" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-2"></i>Add New Player
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

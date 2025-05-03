@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="mb-4">
+        <a href="{{ url_for('public.players') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Players
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 text-center mb-4 mb-md-0">
+                    {% if player.image_url %}
+                        <img src="{{ player.image_url }}" class="img-fluid rounded" alt="{{ player.full_name }}" style="max-height: 300px;">
+                    {% else %}
+                        <div class="ratio ratio-1x1 bg-secondary rounded-circle mx-auto" style="max-width: 250px;">
+                            <div class="d-flex align-items-center justify-content-center text-white">
+                                <span class="display-1">{{ player.first_name[0] }}{{ player.last_name[0] }}</span>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        {% if player.jersey_number %}
+                            <span class="badge bg-primary fs-5 px-3 py-2">#{{ player.jersey_number }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <h1 class="mb-2">{{ player.full_name }}</h1>
+                    <span class="badge bg-primary mb-3">{{ player.position }}</span>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <table class="table">
+                                <tbody>
+                                    {% if player.date_of_birth %}
+                                    <tr>
+                                        <th><i class="bi bi-calendar me-2 text-muted"></i>Date of Birth</th>
+                                        <td>{{ player.date_of_birth.strftime('%d %B %Y') }}
+                                           ({{ (player.date_of_birth.today().year - player.date_of_birth.year) }} years)</td>
+                                    </tr>
+                                    {% endif %}
+
+                                    {% if player.nationality %}
+                                    <tr>
+                                        <th><i class="bi bi-globe me-2 text-muted"></i>Nationality</th>
+                                        <td>{{ player.nationality }}</td>
+                                    </tr>
+                                    {% endif %}
+
+                                    {% if player.height %}
+                                    <tr>
+                                        <th><i class="bi bi-arrow-up-right me-2 text-muted"></i>Height</th>
+                                        <td>{{ player.height }} cm</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-md-6">
+                            <table class="table">
+                                <tbody>
+                                    {% if player.weight %}
+                                    <tr>
+                                        <th><i class="bi bi-speedometer2 me-2 text-muted"></i>Weight</th>
+                                        <td>{{ player.weight }} kg</td>
+                                    </tr>
+                                    {% endif %}
+
+                                    <tr>
+                                        <th><i class="bi bi-circle-fill me-2 text-muted"></i>Status</th>
+                                        <td>
+                                            {% if player.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    {% set stats = player.get_total_statistics() %}
+                                    <tr>
+                                        <th><i class="bi bi-controller me-2 text-muted"></i>Appearances</th>
+                                        <td>{{ stats.appearances }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {% if player.bio %}
+                        <h5 class="border-bottom pb-2 mb-3">Biography</h5>
+                        <p>{{ player.bio }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Stats -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Player Statistics</h4>
+        </div>
+        <div class="card-body">
+            {% set stats = player.get_total_statistics() %}
+
+            <div class="row text-center mb-4">
+                <div class="col-md-2 col-4 mb-3">
+                    <div class="card bg-light h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-muted mb-1">Appearances</h6>
+                            <h3 class="mb-0">{{ stats.appearances }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-4 mb-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-white-50 mb-1">Goals</h6>
+                            <h3 class="mb-0">{{ stats.goals }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-4 mb-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-white-50 mb-1">Assists</h6>
+                            <h3 class="mb-0">{{ stats.assists }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-4 mb-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-white-50 mb-1">Minutes</h6>
+                            <h3 class="mb-0">{{ stats.minutes_played }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-4 mb-3">
+                    <div class="card bg-warning text-dark h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-muted mb-1">Yellow Cards</h6>
+                            <h3 class="mb-0">{{ stats.yellow_cards }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-4 mb-3">
+                    <div class="card bg-danger text-white h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-white-50 mb-1">Red Cards</h6>
+                            <h3 class="mb-0">{{ stats.red_cards }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if player_games %}
+                <h5 class="border-bottom pb-2 mb-3">Game History</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Competition</th>
+                                <th>Match</th>
+                                <th>Result</th>
+                                <th>Stats</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for game in player_games %}
+                                <tr>
+                                    <td>{{ game.date.strftime('%d %b %Y') }}</td>
+                                    <td>
+                                        <span class="badge
+                                            {% if game.event.event_type == 'league' %}bg-primary
+                                            {% elif game.event.event_type == 'tournament' %}bg-success
+                                            {% else %}bg-info{% endif %}">
+                                            {{ game.event.event_type|capitalize }}
+                                        </span>
+                                        <div>{{ game.event.name }}</div>
+                                    </td>
+                                    <td>
+                                        {% if game.is_home_game %}
+                                            <strong>Our Team</strong> vs {{ game.opponent }}
+                                        {% else %}
+                                            {{ game.opponent }} vs <strong>Our Team</strong>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">{{ game.score_team }} - {{ game.score_opponent }}</span>
+                                        <span class="badge
+                                            {% if game.result == 'win' %}bg-success
+                                            {% elif game.result == 'loss' %}bg-danger
+                                            {% else %}bg-secondary{% endif %} ms-2">
+                                            {{ game.result|capitalize }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if game.id in game_stats %}
+                                            {% set stat = game_stats[game.id] %}
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if stat.goals > 0 %}
+                                                    <span class="badge bg-success" title="Goals">
+                                                        <i class="bi bi-bullseye me-1"></i>{{ stat.goals }}
+                                                    </span>
+                                                {% endif %}
+
+                                                {% if stat.assists > 0 %}
+                                                    <span class="badge bg-primary" title="Assists">
+                                                        <i class="bi bi-arrow-return-right me-1"></i>{{ stat.assists }}
+                                                    </span>
+                                                {% endif %}
+
+                                                {% if stat.yellow_cards > 0 %}
+                                                    <span class="badge bg-warning text-dark" title="Yellow Cards">
+                                                        <i class="bi bi-card-list me-1"></i>{{ stat.yellow_cards }}
+                                                    </span>
+                                                {% endif %}
+
+                                                {% if stat.red_cards > 0 %}
+                                                    <span class="badge bg-danger" title="Red Cards">
+                                                        <i class="bi bi-card-list me-1"></i>{{ stat.red_cards }}
+                                                    </span>
+                                                {% endif %}
+
+                                                {% if stat.minutes_played < 90 %}
+                                                    <span class="badge bg-secondary" title="Minutes Played">
+                                                        {{ stat.minutes_played }}'
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-3">
+                    <p class="text-muted mb-0">No game statistics available for this player</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

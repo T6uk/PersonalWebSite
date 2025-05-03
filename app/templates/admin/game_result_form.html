@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Enter Game Result</h1>
+        <a href="{{ url_for('admin.games') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Games
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Game Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Competition:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge
+                                {% if game.event.event_type == 'league' %}bg-primary
+                                {% elif game.event.event_type == 'tournament' %}bg-success
+                                {% else %}bg-info{% endif %}">
+                                {{ game.event.event_type|capitalize }}
+                            </span>
+                            {{ game.event.name }}
+                        </dd>
+
+                        <dt class="col-sm-4">Season:</dt>
+                        <dd class="col-sm-8">{{ game.event.season }}</dd>
+
+                        <dt class="col-sm-4">Match:</dt>
+                        <dd class="col-sm-8">
+                            {% if game.is_home_game %}
+                                Our Team vs <strong>{{ game.opponent }}</strong>
+                            {% else %}
+                                <strong>{{ game.opponent }}</strong> vs Our Team
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Date:</dt>
+                        <dd class="col-sm-8">{{ game.date.strftime('%d %B %Y %H:%M') }}</dd>
+
+                        <dt class="col-sm-4">Location:</dt>
+                        <dd class="col-sm-8">{{ game.location if game.location else 'Not specified' }}</dd>
+
+                        <dt class="col-sm-4">Type:</dt>
+                        <dd class="col-sm-8">{{ 'Home Game' if game.is_home_game else 'Away Game' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Game Result</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Our Team</h5>
+                                <div class="form-floating mb-3 mt-3">
+                                    {{ form.score_team(class="form-control form-control-lg text-center" + (" is-invalid" if form.score_team.errors else ""), placeholder="Team Score", style="font-size: 2rem;") }}
+                                    {{ form.score_team.label }}
+                                    {% if form.score_team.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.score_team.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ game.opponent }}</h5>
+                                <div class="form-floating mb-3 mt-3">
+                                    {{ form.score_opponent(class="form-control form-control-lg text-center" + (" is-invalid" if form.score_opponent.errors else ""), placeholder="Opponent Score", style="font-size: 2rem;") }}
+                                    {{ form.score_opponent.label }}
+                                    {% if form.score_opponent.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.score_opponent.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.status(class="form-control" + (" is-invalid" if form.status.errors else ""), placeholder="Status") }}
+                            {{ form.status.label }}
+                            {% if form.status.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.status.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.highlights_url(class="form-control" + (" is-invalid" if form.highlights_url.errors else ""), placeholder="Highlights URL") }}
+                            {{ form.highlights_url.label }}
+                            {% if form.highlights_url.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.highlights_url.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.notes.label }}</label>
+                            {{ form.notes(class="form-control" + (" is-invalid" if form.notes.errors else ""), rows=3) }}
+                            {% if form.notes.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.notes.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Add any notable events or information about the game</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-between">
+                    <div class="text-muted">
+                        <small>After saving the result, you can add player statistics.</small>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('admin.games') }}" class="btn btn-outline-secondary me-2">Cancel</a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

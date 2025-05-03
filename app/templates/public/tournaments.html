@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Tournaments</h1>
+
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Tournament History</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if tournaments %}
+                        <div class="list-group list-group-flush">
+                            {% for tournament in tournaments %}
+                                <a href="{{ url_for('public.tournaments', tournament=tournament.id) }}"
+                                   class="list-group-item list-group-item-action
+                                   {% if selected_tournament and selected_tournament.id == tournament.id %}active{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ tournament.name }}</h6>
+                                            <small>{{ tournament.season }}</small>
+                                        </div>
+                                        <span class="badge rounded-pill
+                                            {% if tournament.get_status() == 'upcoming' %}bg-warning text-dark
+                                            {% elif tournament.get_status() == 'active' %}bg-success
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ tournament.get_status()|capitalize }}
+                                        </span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-0">No tournaments found</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            {% if selected_tournament %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ selected_tournament.name }}</h4>
+                        <span class="badge bg-light text-dark">{{ selected_tournament.season }}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div>
+                                    <strong><i class="bi bi-calendar-event me-2"></i>Dates:</strong>
+                                    {{ selected_tournament.start_date.strftime('%d %b %Y') }}
+                                    {% if selected_tournament.end_date %}
+                                        - {{ selected_tournament.end_date.strftime('%d %b %Y') }}
+                                    {% endif %}
+                                </div>
+
+                                {% if selected_tournament.location %}
+                                <div class="mt-2">
+                                    <strong><i class="bi bi-geo-alt me-2"></i>Location:</strong>
+                                    {{ selected_tournament.location }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <strong class="me-2">Status:</strong>
+                                    <span class="badge rounded-pill
+                                        {% if selected_tournament.get_status() == 'upcoming' %}bg-warning text-dark
+                                        {% elif selected_tournament.get_status() == 'active' %}bg-success
+                                        {% else %}bg-secondary{% endif %} px-3 py-2">
+                                        {{ selected_tournament.get_status()|capitalize }}
+                                    </span>
+                                </div>
+
+                                {% if selected_tournament.description %}
+                                <div class="mt-2">
+                                    <strong><i class="bi bi-info-circle me-2"></i>Description:</strong>
+                                    <p class="mb-0 mt-1">{{ selected_tournament.description }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Tournament Games -->
+                        <h5 class="border-bottom pb-2 mb-3">Tournament Games</h5>
+
+                        {% if games %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Match</th>
+                                            <th>Result</th>
+                                            <th>Location</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for game in games %}
+                                            <tr>
+                                                <td>{{ game.date.strftime('%d %b %Y') }}</td>
+                                                <td>
+                                                    {% if game.is_home_game %}
+                                                        <strong>Our Team</strong> vs {{ game.opponent }}
+                                                    {% else %}
+                                                        {{ game.opponent }} vs <strong>Our Team</strong>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if game.status == 'completed' %}
+                                                        <span class="fw-bold">{{ game.score_team }} - {{ game.score_opponent }}</span>
+                                                        <span class="badge
+                                                            {% if game.result == 'win' %}bg-success
+                                                            {% elif game.result == 'loss' %}bg-danger
+                                                            {% else %}bg-secondary{% endif %} ms-2">
+                                                            {{ game.result|capitalize }}
+                                                        </span>
+                                                    {% elif game.status == 'upcoming' %}
+                                                        <span class="badge bg-warning text-dark">Upcoming</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">{{ game.status|capitalize }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ game.location if game.location else '-' }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <p class="text-muted mb-0">No games available for this tournament</p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Top Scorers -->
+                        {% if top_scorers %}
+                            <h5 class="border-bottom pb-2 mb-3 mt-4">Top Tournament Scorers</h5>
+
+                            <div class="row">
+                                {% for player, goals in top_scorers %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body p-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0 me-3">
+                                                        {% if player.image_url %}
+                                                            <img src="{{ player.image_url }}" class="rounded-circle" width="50" height="50" alt="{{ player.full_name }}">
+                                                        {% else %}
+                                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                                {{ player.first_name[0] }}{{ player.last_name[0] }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-1">{{ player.full_name }}</h6>
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="badge bg-success me-2">{{ goals }} goal{% if goals != 1 %}s{% endif %}</span>
+                                                            <small class="text-muted">{{ player.position }}</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                {% if tournaments %}
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <div class="mb-3">
+                                <i class="bi bi-arrow-left-circle display-1 text-muted"></i>
+                            </div>
+                            <h5>Select a Tournament</h5>
+                            <p class="text-muted">Please select a tournament from the list to view details.</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <div class="mb-3">
+                                <i class="bi bi-trophy display-1 text-muted"></i>
+                            </div>
+                            <h5>No Tournaments Found</h5>
+                            <p class="text-muted">There are no tournaments available in the database.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

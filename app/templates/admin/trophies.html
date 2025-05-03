@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Trophies</h1>
+        <a href="{{ url_for('admin.add_trophy') }}" class="btn btn-primary">
+            <i class="bi bi-trophy me-2"></i>Add New Trophy
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">All Trophies</h5>
+            <span class="badge bg-secondary">{{ trophies|length }} Total</span>
+        </div>
+        <div class="card-body p-0">
+            {% if trophies %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Trophy</th>
+                            <th>Competition</th>
+                            <th>Year</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trophy in trophies %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        {% if trophy.image_url %}
+                                            <img src="{{ trophy.image_url }}" class="rounded" width="48" height="48" alt="{{ trophy.name }}">
+                                        {% else %}
+                                            <div class="rounded bg-warning text-white d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                                <i class="bi bi-trophy"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ms-3">
+                                        <h6 class="mb-0">{{ trophy.name }}</h6>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ trophy.competition }}</td>
+                            <td>{{ trophy.year }}</td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a href="{{ url_for('admin.edit_trophy', trophy_id=trophy.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ trophy.id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal{{ trophy.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Confirm Deletion</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-start">
+                                                <p>Are you sure you want to delete <strong>{{ trophy.name }}</strong> ({{ trophy.year }})?</p>
+                                                <p class="text-danger mb-0"><small>This action cannot be undone.</small></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form action="{{ url_for('admin.delete_trophy', trophy_id=trophy.id) }}" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-trophy display-1 text-muted"></i>
+                </div>
+                <h5>No Trophies Found</h5>
+                <p class="text-muted">Get started by adding your first trophy.</p>
+                <a href="{{ url_for('admin.add_trophy') }}" class="btn btn-primary">
+                    <i class="bi bi-trophy me-2"></i>Add New Trophy
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

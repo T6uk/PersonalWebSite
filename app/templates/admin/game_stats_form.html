@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Player Statistics</h1>
+        <a href="{{ url_for('admin.games') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Games
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Game Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Competition:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge
+                                {% if game.event.event_type == 'league' %}bg-primary
+                                {% elif game.event.event_type == 'tournament' %}bg-success
+                                {% else %}bg-info{% endif %}">
+                                {{ game.event.event_type|capitalize }}
+                            </span>
+                            {{ game.event.name }}
+                        </dd>
+
+                        <dt class="col-sm-4">Season:</dt>
+                        <dd class="col-sm-8">{{ game.event.season }}</dd>
+
+                        <dt class="col-sm-4">Date:</dt>
+                        <dd class="col-sm-8">{{ game.date.strftime('%d %B %Y') }}</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Match:</dt>
+                        <dd class="col-sm-8">
+                            {% if game.is_home_game %}
+                                Our Team vs <strong>{{ game.opponent }}</strong>
+                            {% else %}
+                                <strong>{{ game.opponent }}</strong> vs Our Team
+                            {% endif %}
+                        </dd>
+
+                        <dt class="col-sm-4">Result:</dt>
+                        <dd class="col-sm-8">
+                            <strong>{{ game.score_team }} - {{ game.score_opponent }}</strong>
+                            <span class="badge
+                                {% if game.result == 'win' %}bg-success
+                                {% elif game.result == 'loss' %}bg-danger
+                                {% else %}bg-secondary{% endif %} ms-2">
+                                {{ game.result|capitalize }}
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-4">Location:</dt>
+                        <dd class="col-sm-8">{{ game.location if game.location else 'Not specified' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Player Statistics</h5>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="addPlayerBtn">
+                <i class="bi bi-plus-circle me-1"></i>Add Player
+            </button>
+        </div>
+        <div class="card-body">
+            <form method="POST" id="statsForm">
+                {{ form.hidden_tag() }}
+
+                <div class="player-stats">
+                    {% for player_form in form.player_stats %}
+                        <div class="player-entry card mb-3">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                                <h6 class="mb-0">Player #{{ loop.index }}</h6>
+                                {% if loop.index > 1 %}
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-player">
+                                        <i class="bi bi-x-lg"></i> Remove
+                                    </button>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <!-- Player selection -->
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ player_form.player_id(class="form-control", placeholder="Player") }}
+                                            {{ player_form.player_id.label }}
+                                        </div>
+                                    </div>
+
+                                    <!-- Rating -->
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ player_form.rating(class="form-control", placeholder="Player Rating (1-10)") }}
+                                            {{ player_form.rating.label }}
+                                        </div>
+                                    </div>
+
+                                    <!-- Performance stats -->
+                                    <div class="col-12">
+                                        <div class="row g-2">
+                                            <div class="col-md-3">
+                                                <div class="form-floating mb-3">
+                                                    {{ player_form.minutes_played(class="form-control", placeholder="Minutes Played") }}
+                                                    {{ player_form.minutes_played.label }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-floating mb-3">
+                                                    {{ player_form.goals(class="form-control", placeholder="Goals") }}
+                                                    {{ player_form.goals.label }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-floating mb-3">
+                                                    {{ player_form.assists(class="form-control", placeholder="Assists") }}
+                                                    {{ player_form.assists.label }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-floating mb-3">
+                                                    {{ player_form.shots(class="form-control", placeholder="Shots") }}
+                                                    {{ player_form.shots.label }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Additional stats -->
+                                    <div class="col-12">
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <div class="form-floating mb-3">
+                                                    {{ player_form.shots_on_target(class="form-control", placeholder="Shots on Target") }}
+                                                    {{ player_form.shots_on_target.label }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating mb-3">
+                                                    {{ player_form.yellow_cards(class="form-control", placeholder="Yellow Cards") }}
+                                                    {{ player_form.yellow_cards.label }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating mb-3">
+                                                    {{ player_form.red_cards(class="form-control", placeholder="Red Cards") }}
+                                                    {{ player_form.red_cards.label }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Notes -->
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">{{ player_form.notes.label }}</label>
+                                            {{ player_form.notes(class="form-control", rows=2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end">
+                    <a href="{{ url_for('admin.games') }}" class="btn btn-outline-secondary me-2">Cancel</a>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add player button
+        const addPlayerBtn = document.getElementById('addPlayerBtn');
+        const playerStats = document.querySelector('.player-stats');
+        const firstPlayerEntry = document.querySelector('.player-entry');
+
+        if (addPlayerBtn && playerStats && firstPlayerEntry) {
+            addPlayerBtn.addEventListener('click', function() {
+                const playerCount = document.querySelectorAll('.player-entry').length;
+                const newEntry = firstPlayerEntry.cloneNode(true);
+                const header = newEntry.querySelector('.card-header h6');
+
+                // Update the header
+                if (header) {
+                    header.textContent = `Player #${playerCount + 1}`;
+                }
+
+                // Update form field names
+                updateFieldNames(newEntry, playerCount);
+
+                // Clear input values
+                const inputs = newEntry.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    if (input.type === 'number') {
+                        input.value = '0';
+                    } else if (input.tagName === 'SELECT') {
+                        // Keep the first option selected
+                    } else {
+                        input.value = '';
+                    }
+                });
+
+                // Add remove button functionality
+                const removeBtn = newEntry.querySelector('.remove-player');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function() {
+                        newEntry.remove();
+                        updateAllEntryNumbers();
+                    });
+                } else {
+                    const header = newEntry.querySelector('.card-header');
+                    if (header) {
+                        // Add remove button if it doesn't exist
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.className = 'btn btn-sm btn-outline-danger remove-player';
+                        removeBtn.innerHTML = '<i class="bi bi-x-lg"></i> Remove';
+                        removeBtn.addEventListener('click', function() {
+                            newEntry.remove();
+                            updateAllEntryNumbers();
+                        });
+                        header.appendChild(removeBtn);
+                    }
+                }
+
+                playerStats.appendChild(newEntry);
+            });
+
+            // Remove player buttons
+            document.querySelectorAll('.remove-player').forEach(button => {
+                button.addEventListener('click', function() {
+                    const playerEntry = this.closest('.player-entry');
+                    playerEntry.remove();
+                    updateAllEntryNumbers();
+                });
+            });
+
+            // Update field names in a cloned entry
+            function updateFieldNames(entry, index) {
+                const inputs = entry.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    if (input.name) {
+                        input.name = input.name.replace(/player_stats-\d+/, `player_stats-${index}`);
+                        input.id = input.id.replace(/player_stats-\d+/, `player_stats-${index}`);
+                    }
+                });
+
+                const labels = entry.querySelectorAll('label');
+                labels.forEach(label => {
+                    if (label.htmlFor) {
+                        label.htmlFor = label.htmlFor.replace(/player_stats-\d+/, `player_stats-${index}`);
+                    }
+                });
+            }
+
+            // Update all entry numbers after removal
+            function updateAllEntryNumbers() {
+                const playerEntries = document.querySelectorAll('.player-entry');
+                playerEntries.forEach((entry, index) => {
+                    const header = entry.querySelector('.card-header h6');
+                    if (header) {
+                        header.textContent = `Player #${index + 1}`;
+                    }
+                    updateFieldNames(entry, index);
+                });
+            }
+        }
+    });
+</script>
+{% endblock %}
