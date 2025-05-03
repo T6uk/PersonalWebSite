@@ -147,7 +147,12 @@
                     <h4 class="mb-0">{{ event.name }}</h4>
                 </div>
                 <div class="card-body p-0">
-                    {% set event_games = [g for g in games if g.event_id == event.id] %}
+                    {% set event_games = [] %}
+                    {% for g in games %}
+                        {% if g.event_id == event.id %}
+                            {% set event_games = event_games + [g] %}
+                        {% endif %}
+                    {% endfor %}
 
                     {% if event_games %}
                         <div class="table-responsive">

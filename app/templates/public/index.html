@@ -1,57 +1,43 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="bg-primary text-white py-5 mb-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-3">Your Team's Journey</h1>
-                <p class="lead mb-4">Follow your favorite football team through every game, tournament, and championship. Stay updated with the latest results and player statistics.</p>
-                <div class="d-flex gap-3">
-                    <a href="{{ url_for('public.league') }}" class="btn btn-light btn-lg">League Games</a>
-                    <a href="{{ url_for('public.tournaments') }}" class="btn btn-outline-light btn-lg">Tournaments</a>
-                </div>
-            </div>
-            <div class="col-lg-6 d-none d-lg-block">
-                <img src="{{ url_for('static', filename='img/team-hero.jpg') }}" alt="Football Team" class="img-fluid rounded shadow-lg" onerror="this.src='https://placehold.co/600x400?text=Football+Team';this.onerror='';">
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="container">
     <!-- Latest Game Result -->
     {% if latest_game %}
-    <div class="card border-0 shadow-sm mb-5">
-        <div class="card-header bg-light">
-            <h2 class="h4 mb-0">Latest Result</h2>
+    <!-- Latest Game Result - Enhanced Design -->
+    <div class="card border-0 shadow-sm mb-4 match-card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h2 class="h4 mb-0"><i class="bi bi-controller me-2"></i>Latest Result</h2>
+            <span class="badge
+            {% if latest_game.result == 'win' %}bg-success
+            {% elif latest_game.result == 'loss' %}bg-danger
+            {% else %}bg-secondary{% endif %} px-3 py-2">
+            {{ latest_game.result|capitalize if latest_game.result else 'N/A' }}
+        </span>
         </div>
         <div class="card-body p-0">
             <div class="row g-0">
                 <div class="col-md-8">
                     <div class="p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
                                 <h3 class="h5 mb-1">{{ latest_game.event.name }}</h3>
-                                <p class="text-muted mb-0">{{ latest_game.date.strftime('%d %B %Y') }}</p>
+                                <p class="text-muted mb-0">
+                                    <i class="bi bi-calendar3 me-2"></i>{{ latest_game.date.strftime('%d %B %Y') }}
+                                </p>
                             </div>
-                            <span class="badge
-                                {% if latest_game.result == 'win' %}bg-success
-                                {% elif latest_game.result == 'loss' %}bg-danger
-                                {% else %}bg-secondary{% endif %} p-2">
-                                {{ latest_game.result|capitalize if latest_game.result else 'N/A' }}
-                            </span>
                         </div>
 
-                        <div class="text-center mb-4">
+                        <div class="text-center mb-4 p-3 bg-light rounded">
                             <div class="row align-items-center">
                                 <div class="col-4 text-end">
                                     <h4 class="mb-1">Our Team</h4>
                                     <div class="text-muted">Home</div>
                                 </div>
                                 <div class="col-4">
-                                    <div class="display-6 fw-bold">{{ latest_game.score_team }} - {{ latest_game.score_opponent }}</div>
+                                    <div class="display-6 fw-bold">{{ latest_game.score_team }} - {{
+                                        latest_game.score_opponent }}
+                                    </div>
                                 </div>
                                 <div class="col-4 text-start">
                                     <h4 class="mb-1">{{ latest_game.opponent }}</h4>
@@ -70,41 +56,46 @@
                     </div>
                 </div>
                 <div class="col-md-4 bg-light d-flex flex-column p-4">
-                    <h4 class="h5 mb-3">Top Performers</h4>
-                    {% set player_stats = latest_game.player_statistics|sort(attribute='goals', reverse=True)|slice(0, 3) %}
+                    <h4 class="h5 mb-3"><i class="bi bi-star me-2"></i>Top Performers</h4>
+                    {% set player_stats = latest_game.player_statistics|sort(attribute='goals', reverse=True)|slice(0,
+                    3) %}
 
                     {% if player_stats %}
-                        <div class="list-group list-group-flush">
-                            {% for stat in player_stats %}
-                                <div class="list-group-item bg-transparent px-0">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            {% if stat.player.image_url %}
-                                                <img src="{{ stat.player.image_url }}" class="rounded-circle" width="40" height="40" alt="{{ stat.player.full_name }}">
-                                            {% else %}
-                                                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                                    {{ stat.player.first_name[0] }}{{ stat.player.last_name[0] }}
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                        <div class="ms-3">
-                                            <h6 class="mb-0">{{ stat.player.full_name }}</h6>
-                                            <small>
-                                                {% if stat.goals > 0 %}{{ stat.goals }} goal{% if stat.goals > 1 %}s{% endif %}{% endif %}
-                                                {% if stat.goals > 0 and stat.assists > 0 %}, {% endif %}
-                                                {% if stat.assists > 0 %}{{ stat.assists }} assist{% if stat.assists > 1 %}s{% endif %}{% endif %}
-                                            </small>
-                                        </div>
+                    <div class="list-group list-group-flush">
+                        {% for stat in player_stats %}
+                        <div class="list-group-item bg-transparent px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    {% if stat.player.image_url %}
+                                    <img src="{{ stat.player.image_url }}" class="rounded-circle" width="40" height="40"
+                                         alt="{{ stat.player.full_name }}">
+                                    {% else %}
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
+                                        {{ stat.player.first_name[0] }}{{ stat.player.last_name[0] }}
                                     </div>
+                                    {% endif %}
                                 </div>
-                            {% endfor %}
+                                <div class="ms-3">
+                                    <h6 class="mb-0">{{ stat.player.full_name }}</h6>
+                                    <small>
+                                        {% if stat.goals > 0 %}{{ stat.goals }} <i
+                                            class="bi bi-bullseye text-success"></i>{% endif %}
+                                        {% if stat.goals > 0 and stat.assists > 0 %} · {% endif %}
+                                        {% if stat.assists > 0 %}{{ stat.assists }} <i
+                                            class="bi bi-hand-thumbs-up text-primary"></i>{% endif %}
+                                    </small>
+                                </div>
+                            </div>
                         </div>
+                        {% endfor %}
+                    </div>
                     {% else %}
-                        <p class="text-muted">No player statistics available</p>
+                    <p class="text-muted">No player statistics available</p>
                     {% endif %}
 
-                    <a href="{{ url_for('public.statistics') }}" class="btn btn-sm btn-outline-secondary mt-auto">
-                        View All Statistics
+                    <a href="{{ url_for('public.statistics') }}" class="btn btn-sm btn-outline-primary mt-auto">
+                        <i class="bi bi-graph-up me-1"></i>View All Statistics
                     </a>
                 </div>
             </div>
@@ -122,52 +113,66 @@
                 </div>
                 <div class="card-body p-0">
                     {% if upcoming_games %}
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Competition</th>
-                                        <th>Opponent</th>
-                                        <th>Location</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for game in upcoming_games %}
-                                        <tr>
-                                            <td>
-                                                <div class="fw-semibold">{{ game.date.strftime('%d %b %Y') }}</div>
-                                                <small class="text-muted">{{ game.date.strftime('%H:%M') }}</small>
-                                            </td>
-                                            <td>
-                                                <span class="badge
-                                                    {% if game.event.event_type == 'league' %}bg-primary
-                                                    {% elif game.event.event_type == 'tournament' %}bg-success
-                                                    {% else %}bg-info{% endif %}">
-                                                    {{ game.event.event_type|capitalize }}
-                                                </span>
-                                                <div>{{ game.event.name }}</div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    {% if game.is_home_game %}
-                                                        <span class="badge bg-success me-2">H</span>
-                                                    {% else %}
-                                                        <span class="badge bg-secondary me-2">A</span>
-                                                    {% endif %}
-                                                    {{ game.opponent }}
-                                                </div>
-                                            </td>
-                                            <td>{{ game.location }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>
+                                    <i class="bi bi-calendar3 me-1"></i>Date
+                                </th>
+                                <th>
+                                    <i class="bi bi-trophy me-1"></i>Competition
+                                </th>
+                                <th>
+                                    <i class="bi bi-people me-1"></i>Opponent
+                                </th>
+                                <th>
+                                    <i class="bi bi-geo-alt me-1"></i>Location
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for game in upcoming_games %}
+                            <tr class="match-card">
+                                <td>
+                                    <div class="fw-semibold">{{ game.date.strftime('%d %b %Y') }}</div>
+                                    <small class="text-muted">{{ game.date.strftime('%H:%M') }}</small>
+                                </td>
+                                <td>
+                        <span class="badge
+                            {% if game.event.event_type == 'league' %}bg-primary
+                            {% elif game.event.event_type == 'tournament' %}bg-success
+                            {% else %}bg-info{% endif %} me-1">
+                            {{ game.event.event_type|capitalize }}
+                        </span>
+                                    <div class="mt-1">{{ game.event.name }}</div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if game.is_home_game %}
+                                        <span class="badge bg-success me-2 px-2 py-1">HOME</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary me-2 px-2 py-1">AWAY</span>
+                                        {% endif %}
+                                        <span class="fw-medium">{{ game.opponent }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if game.location %}
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ game.location }}
+                                    {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                     {% else %}
-                        <div class="text-center p-4">
-                            <p class="text-muted mb-0">No upcoming games scheduled</p>
-                        </div>
+                    <div class="text-center p-4">
+                        <p class="text-muted mb-0">No upcoming games scheduled</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -182,28 +187,29 @@
                 </div>
                 <div class="card-body p-0">
                     {% if top_scorers %}
-                        <div class="list-group list-group-flush">
-                            {% for player, goals in top_scorers %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0 me-3">
-                                            <div class="bg-primary rounded-circle text-white fw-bold d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                                {{ loop.index }}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">{{ player.full_name }}</h6>
-                                            <small class="text-muted">{{ player.position }}</small>
-                                        </div>
+                    <div class="list-group list-group-flush">
+                        {% for player, goals in top_scorers %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <div class="bg-primary rounded-circle text-white fw-bold d-flex align-items-center justify-content-center"
+                                         style="width: 32px; height: 32px;">
+                                        {{ loop.index }}
                                     </div>
-                                    <span class="badge bg-primary rounded-pill fs-6">{{ goals }}</span>
                                 </div>
-                            {% endfor %}
+                                <div>
+                                    <h6 class="mb-0">{{ player.full_name }}</h6>
+                                    <small class="text-muted">{{ player.position }}</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-primary rounded-pill fs-6">{{ goals }}</span>
                         </div>
+                        {% endfor %}
+                    </div>
                     {% else %}
-                        <div class="text-center p-4">
-                            <p class="text-muted mb-0">No player statistics available</p>
-                        </div>
+                    <div class="text-center p-4">
+                        <p class="text-muted mb-0">No player statistics available</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -219,70 +225,73 @@
                 </div>
                 <div class="card-body">
                     {% if upcoming_events %}
-                        <div class="row">
-                            {% for event in upcoming_events %}
-                                <div class="col-md-4 mb-4">
-                                    <div class="card h-100">
-                                        <div class="card-img-top bg-light pt-3 px-3">
-                                            <div class="text-center">
-                                                {% if event.image_url %}
-                                                    <img src="{{ event.image_url }}" class="img-fluid rounded" alt="{{ event.name }}" style="max-height: 150px;">
-                                                {% else %}
-                                                    <div class="ratio ratio-16x9 bg-secondary rounded">
-                                                        <div class="d-flex align-items-center justify-content-center text-white">
-                                                            <div>
-                                                                <i class="bi bi-calendar-event fs-1"></i>
-                                                                <div>{{ event.event_type|capitalize }}</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
+                    <div class="row">
+                        {% for event in upcoming_events %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-img-top bg-light pt-3 px-3">
+                                    <div class="text-center">
+                                        {% if event.image_url %}
+                                        <img src="{{ event.image_url }}" class="img-fluid rounded"
+                                             alt="{{ event.name }}" style="max-height: 150px;">
+                                        {% else %}
+                                        <div class="ratio ratio-16x9 bg-secondary rounded">
+                                            <div class="d-flex align-items-center justify-content-center text-white">
+                                                <div>
+                                                    <i class="bi bi-calendar-event fs-1"></i>
+                                                    <div>{{ event.event_type|capitalize }}</div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{ event.name }}</h5>
-                                            <div class="d-flex mb-3">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ event.name }}</h5>
+                                    <div class="d-flex mb-3">
                                                 <span class="badge
                                                     {% if event.event_type == 'league' %}bg-primary
                                                     {% elif event.event_type == 'tournament' %}bg-success
                                                     {% else %}bg-info{% endif %} me-2">
                                                     {{ event.event_type|capitalize }}
                                                 </span>
-                                                <span class="badge bg-secondary">{{ event.season }}</span>
-                                            </div>
-                                            <p class="card-text">
-                                                <i class="bi bi-calendar3 text-muted me-2"></i>
-                                                {{ event.start_date.strftime('%d %b %Y') }}
-                                                {% if event.end_date %}
-                                                    - {{ event.end_date.strftime('%d %b %Y') }}
-                                                {% endif %}
-                                            </p>
-                                            {% if event.location %}
-                                                <p class="card-text">
-                                                    <i class="bi bi-geo-alt text-muted me-2"></i>
-                                                    {{ event.location }}
-                                                </p>
-                                            {% endif %}
-
-                                            {% if event.description %}
-                                                <p class="card-text text-truncate">{{ event.description }}</p>
-                                            {% endif %}
-                                        </div>
-                                        <div class="card-footer bg-white border-top-0">
-                                            {% if event.event_type == 'league' %}
-                                                <a href="{{ url_for('public.league', season=event.season) }}" class="btn btn-sm btn-outline-primary w-100">View Details</a>
-                                            {% elif event.event_type == 'tournament' %}
-                                                <a href="{{ url_for('public.tournaments', tournament=event.id) }}" class="btn btn-sm btn-outline-primary w-100">View Details</a>
-                                            {% endif %}
-                                        </div>
+                                        <span class="badge bg-secondary">{{ event.season }}</span>
                                     </div>
+                                    <p class="card-text">
+                                        <i class="bi bi-calendar3 text-muted me-2"></i>
+                                        {{ event.start_date.strftime('%d %b %Y') }}
+                                        {% if event.end_date %}
+                                        - {{ event.end_date.strftime('%d %b %Y') }}
+                                        {% endif %}
+                                    </p>
+                                    {% if event.location %}
+                                    <p class="card-text">
+                                        <i class="bi bi-geo-alt text-muted me-2"></i>
+                                        {{ event.location }}
+                                    </p>
+                                    {% endif %}
+
+                                    {% if event.description %}
+                                    <p class="card-text text-truncate">{{ event.description }}</p>
+                                    {% endif %}
                                 </div>
-                            {% endfor %}
+                                <div class="card-footer bg-white border-top-0">
+                                    {% if event.event_type == 'league' %}
+                                    <a href="{{ url_for('public.league', season=event.season) }}"
+                                       class="btn btn-sm btn-outline-primary w-100">View Details</a>
+                                    {% elif event.event_type == 'tournament' %}
+                                    <a href="{{ url_for('public.tournaments', tournament=event.id) }}"
+                                       class="btn btn-sm btn-outline-primary w-100">View Details</a>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
+                        {% endfor %}
+                    </div>
                     {% else %}
-                        <div class="text-center py-4">
-                            <p class="text-muted mb-0">No upcoming events scheduled</p>
-                        </div>
+                    <div class="text-center py-4">
+                        <p class="text-muted mb-0">No upcoming events scheduled</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>
