@@ -169,6 +169,98 @@
                         </div>
                     </div>
 
+                    <!-- Previous Career Statistics -->
+                    <div class="col-12 mt-3">
+                        <h5 class="border-bottom pb-2 mb-3">Previous Career Statistics</h5>
+                        <p class="text-muted mb-3">Enter statistics from the player's career before joining the team. These will be combined with game statistics tracked in the system.</p>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    {{ form.career_appearances(class="form-control" + (" is-invalid" if form.career_appearances.errors else ""), placeholder="Career Appearances") }}
+                                    {{ form.career_appearances.label }}
+                                    {% if form.career_appearances.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.career_appearances.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    {{ form.career_goals(class="form-control" + (" is-invalid" if form.career_goals.errors else ""), placeholder="Career Goals") }}
+                                    {{ form.career_goals.label }}
+                                    {% if form.career_goals.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.career_goals.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    {{ form.career_assists(class="form-control" + (" is-invalid" if form.career_assists.errors else ""), placeholder="Career Assists") }}
+                                    {{ form.career_assists.label }}
+                                    {% if form.career_assists.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.career_assists.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    {{ form.career_yellow_cards(class="form-control" + (" is-invalid" if form.career_yellow_cards.errors else ""), placeholder="Career Yellow Cards") }}
+                                    {{ form.career_yellow_cards.label }}
+                                    {% if form.career_yellow_cards.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.career_yellow_cards.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    {{ form.career_red_cards(class="form-control" + (" is-invalid" if form.career_red_cards.errors else ""), placeholder="Career Red Cards") }}
+                                    {{ form.career_red_cards.label }}
+                                    {% if form.career_red_cards.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.career_red_cards.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    {{ form.career_minutes_played(class="form-control" + (" is-invalid" if form.career_minutes_played.errors else ""), placeholder="Career Minutes Played") }}
+                                    {{ form.career_minutes_played.label }}
+                                    {% if form.career_minutes_played.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.career_minutes_played.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {% if player %}
                         <div class="col-md-4 mb-4">
                             <div class="card">

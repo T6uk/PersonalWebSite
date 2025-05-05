@@ -12,12 +12,12 @@ def init_db():
     db.create_all()
 
     # Check if admin user exists
-    admin = User.query.filter_by(username='admin').first()
+    admin = User.query.filter_by(username='mara').first()
     if not admin:
         # Create admin user with password from environment or default
         admin_password = os.environ.get('ADMIN_PASSWORD', '1234')
         hashed_password = generate_password_hash(admin_password)
-        admin = User(username='admin', password_hash=hashed_password, is_admin=True)
+        admin = User(username='mara', password_hash=hashed_password, is_admin=True)
         db.session.add(admin)
         db.session.commit()
         print("Admin user created")

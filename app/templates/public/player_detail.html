@@ -85,7 +85,7 @@
 
                                     {% set stats = player.get_total_statistics() %}
                                     <tr>
-                                        <th><i class="bi bi-controller me-2 text-muted"></i>Appearances</th>
+                                        <th><i class="bi bi-controller me-2 text-muted"></i>Career Appearances</th>
                                         <td>{{ stats.appearances }}</td>
                                     </tr>
                                 </tbody>
@@ -102,72 +102,230 @@
         </div>
     </div>
 
-    <!-- Player Stats -->
+    <!-- Player Stats with tabs for Total/Team/Career -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0">Player Statistics</h4>
         </div>
         <div class="card-body">
-            {% set stats = player.get_total_statistics() %}
+            {% set total_stats = player.get_total_statistics() %}
+            {% set team_stats = player.get_team_statistics() %}
+            {% set career_stats = player.get_career_statistics() %}
 
-            <div class="row text-center mb-4">
-                <div class="col-md-2 col-4 mb-3">
-                    <div class="card bg-light h-100">
-                        <div class="card-body py-3">
-                            <h6 class="text-muted mb-1">Appearances</h6>
-                            <h3 class="mb-0">{{ stats.appearances }}</h3>
+            <ul class="nav nav-tabs mb-4" id="statsTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="total-tab" data-bs-toggle="tab" data-bs-target="#total" type="button" role="tab" aria-controls="total" aria-selected="true">
+                        <i class="bi bi-bar-chart-fill me-1"></i>Total Stats
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-controls="team" aria-selected="false">
+                        <i class="bi bi-people-fill me-1"></i>Team Stats
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="career-tab" data-bs-toggle="tab" data-bs-target="#career" type="button" role="tab" aria-controls="career" aria-selected="false">
+                        <i class="bi bi-person-bounding-box me-1"></i>Career Stats
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="statsTabsContent">
+                <!-- Total Statistics Tab (Career + Team) -->
+                <div class="tab-pane fade show active" id="total" role="tabpanel" aria-labelledby="total-tab">
+                    <div class="row text-center mb-4">
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-muted mb-1">Appearances</h6>
+                                    <h3 class="mb-0">{{ total_stats.appearances }}</h3>
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Goals</h6>
+                                    <h3 class="mb-0">{{ total_stats.goals }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-primary text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Assists</h6>
+                                    <h3 class="mb-0">{{ total_stats.assists }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-info text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Minutes</h6>
+                                    <h3 class="mb-0">{{ total_stats.minutes_played }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-warning text-dark h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-muted mb-1">Yellow Cards</h6>
+                                    <h3 class="mb-0">{{ total_stats.yellow_cards }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-danger text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Red Cards</h6>
+                                    <h3 class="mb-0">{{ total_stats.red_cards }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Total statistics include both previous career stats and team stats from tracked games.
                     </div>
                 </div>
 
-                <div class="col-md-2 col-4 mb-3">
-                    <div class="card bg-success text-white h-100">
-                        <div class="card-body py-3">
-                            <h6 class="text-white-50 mb-1">Goals</h6>
-                            <h3 class="mb-0">{{ stats.goals }}</h3>
+                <!-- Team Statistics Tab -->
+                <div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
+                    <div class="row text-center mb-4">
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-muted mb-1">Appearances</h6>
+                                    <h3 class="mb-0">{{ team_stats.appearances }}</h3>
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Goals</h6>
+                                    <h3 class="mb-0">{{ team_stats.goals }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-primary text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Assists</h6>
+                                    <h3 class="mb-0">{{ team_stats.assists }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-info text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Minutes</h6>
+                                    <h3 class="mb-0">{{ team_stats.minutes_played }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-warning text-dark h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-muted mb-1">Yellow Cards</h6>
+                                    <h3 class="mb-0">{{ team_stats.yellow_cards }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-danger text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Red Cards</h6>
+                                    <h3 class="mb-0">{{ team_stats.red_cards }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Team statistics only include stats from games tracked in this system.
                     </div>
                 </div>
 
-                <div class="col-md-2 col-4 mb-3">
-                    <div class="card bg-primary text-white h-100">
-                        <div class="card-body py-3">
-                            <h6 class="text-white-50 mb-1">Assists</h6>
-                            <h3 class="mb-0">{{ stats.assists }}</h3>
+                <!-- Career Statistics Tab (Prior to joining) -->
+                <div class="tab-pane fade" id="career" role="tabpanel" aria-labelledby="career-tab">
+                    <div class="row text-center mb-4">
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-muted mb-1">Appearances</h6>
+                                    <h3 class="mb-0">{{ career_stats.appearances }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Goals</h6>
+                                    <h3 class="mb-0">{{ career_stats.goals }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-primary text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Assists</h6>
+                                    <h3 class="mb-0">{{ career_stats.assists }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-info text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Minutes</h6>
+                                    <h3 class="mb-0">{{ career_stats.minutes_played }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-warning text-dark h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-muted mb-1">Yellow Cards</h6>
+                                    <h3 class="mb-0">{{ career_stats.yellow_cards }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-4 mb-3">
+                            <div class="card bg-danger text-white h-100">
+                                <div class="card-body py-3">
+                                    <h6 class="text-white-50 mb-1">Red Cards</h6>
+                                    <h3 class="mb-0">{{ career_stats.red_cards }}</h3>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-2 col-4 mb-3">
-                    <div class="card bg-info text-white h-100">
-                        <div class="card-body py-3">
-                            <h6 class="text-white-50 mb-1">Minutes</h6>
-                            <h3 class="mb-0">{{ stats.minutes_played }}</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-2 col-4 mb-3">
-                    <div class="card bg-warning text-dark h-100">
-                        <div class="card-body py-3">
-                            <h6 class="text-muted mb-1">Yellow Cards</h6>
-                            <h3 class="mb-0">{{ stats.yellow_cards }}</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-2 col-4 mb-3">
-                    <div class="card bg-danger text-white h-100">
-                        <div class="card-body py-3">
-                            <h6 class="text-white-50 mb-1">Red Cards</h6>
-                            <h3 class="mb-0">{{ stats.red_cards }}</h3>
-                        </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Career statistics represent the player's career before joining this team.
                     </div>
                 </div>
             </div>
 
             {% if player_games %}
-                <h5 class="border-bottom pb-2 mb-3">Game History</h5>
+                <h5 class="border-bottom pb-2 mb-3 mt-4">Game History</h5>
 
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">

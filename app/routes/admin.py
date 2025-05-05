@@ -92,7 +92,14 @@ def add_player():
             weight=form.weight.data,
             nationality=form.nationality.data,
             bio=form.bio.data,
-            is_active=form.is_active.data
+            is_active=form.is_active.data,
+            # Add career statistics
+            career_appearances=form.career_appearances.data,
+            career_goals=form.career_goals.data,
+            career_assists=form.career_assists.data,
+            career_yellow_cards=form.career_yellow_cards.data,
+            career_red_cards=form.career_red_cards.data,
+            career_minutes_played=form.career_minutes_played.data
         )
 
         if form.image.data:
@@ -124,6 +131,13 @@ def edit_player(player_id):
         player.nationality = form.nationality.data
         player.bio = form.bio.data
         player.is_active = form.is_active.data
+        # Update career statistics
+        player.career_appearances = form.career_appearances.data
+        player.career_goals = form.career_goals.data
+        player.career_assists = form.career_assists.data
+        player.career_yellow_cards = form.career_yellow_cards.data
+        player.career_red_cards = form.career_red_cards.data
+        player.career_minutes_played = form.career_minutes_played.data
 
         if form.image.data:
             player.image_url = save_file(form.image.data, 'players')
