@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Friendlies</h1>
+
+        {% if seasons %}
+        <div class="d-flex align-items-center">
+            <label for="seasonSelect" class="me-2">Season:</label>
+            <select id="seasonSelect" class="form-select" onchange="window.location.href='{{ url_for('public.friendlies') }}?season=' + this.value">
+                {% for season in seasons %}
+                <option value="{{ season.id }}" {% if season.id == selected_season.id %}selected{% endif %}>{{ season.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if not seasons %}
+        <div class="alert alert-info">
+            No seasons have been added yet. Please create a season in the admin panel first.
+        </div>
+    {% elif not friendlies %}
+        <div class="alert alert-info">
+            No friendly matches have been added for the selected season.
+        </div>
+    {% else %}
+        <!-- Friendlies List -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Friendly Matches</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            {% for friendly in friendlies %}
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-info text-white">
+                                            <h5 class="mb-0">{{ friendly.name }}</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <strong><i class="bi bi-calendar-event me-2"></i>Dates:</strong>
+                                                {{ friendly.start_date.strftime('%d %b %Y') }}
+                                                {% if friendly.end_date %}
+                                                    - {{ friendly.end_date.strftime('%d %b %Y') }}
+                                                {% endif %}
+                                            </div>
+
+                                            {% if friendly.location %}
+                                            <div class="mb-3">
+                                                <strong><i class="bi bi-geo-alt me-2"></i>Location:</strong>
+                                                {{ friendly.location }}
+                                            </div>
+                                            {% endif %}
+
+                                            {% if friendly.purpose %}
+                                            <div class="mb-3">
+                                                <strong><i class="bi bi-flag me-2"></i>Purpose:</strong>
+                                                {{ friendly.purpose }}
+                                            </div>
+                                            {% endif %}
+
+                                            {% if friendly.description %}
+                                            <div>
+                                                <strong><i class="bi bi-info-circle me-2"></i>Description:</strong>
+                                                <p class="mt-1">{{ friendly.description }}</p>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Games -->
+        {% if games %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Friendly Games</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Match</th>
+                                    <th>Result</th>
+                                    <th>Friendly</th>
+                                    <th>Location</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for game in games %}
+                                    <tr>
+                                        <td>
+                                            <div>{{ game.date.strftime('%d %b %Y') }}</div>
+                                            <small class="text-muted">{{ game.date.strftime('%H:%M') }}</small>
+                                        </td>
+                                        <td>
+                                            {% if game.is_home_game %}
+                                                <strong>Our Team</strong> vs {{ game.opponent }}
+                                            {% else %}
+                                                {{ game.opponent }} vs <strong>Our Team</strong>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if game.status == 'completed' %}
+                                                <span class="fw-bold">{{ game.score_team }} - {{ game.score_opponent }}</span>
+                                                <span class="badge
+                                                    {% if game.result == 'win' %}bg-success
+                                                    {% elif game.result == 'loss' %}bg-danger
+                                                    {% else %}bg-secondary{% endif %} ms-2">
+                                                    {{ game.result|capitalize }}
+                                                </span>
+                                            {% elif game.status == 'upcoming' %}
+                                                <span class="badge bg-warning text-dark">Upcoming</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ game.status|capitalize }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ game.competition.name }}
+                                        </td>
+                                        <td>{{ game.location if game.location else '-' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,15 +1,21 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, DateTimeField, TextAreaField, BooleanField
-from wtforms import IntegerField, SubmitField, FormField, FieldList, Form, FloatField
+from wtforms import StringField, SelectField, TextAreaField, BooleanField, IntegerField, SubmitField
+from wtforms import FormField, FieldList, Form, FloatField
 from wtforms.validators import DataRequired, Optional, NumberRange, Length, URL
 from wtforms.fields import DateTimeLocalField
 
+
 class GameForm(FlaskForm):
-    event_id = SelectField('Event', coerce=int, validators=[DataRequired()])
+    competition_id = SelectField('Competition', coerce=int, validators=[DataRequired()])
     opponent = StringField('Opponent', validators=[DataRequired(), Length(max=128)])
     date = DateTimeLocalField('Date and Time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
     location = StringField('Location', validators=[Optional(), Length(max=128)])
     is_home_game = BooleanField('Home Game', default=True)
+
+    # Competition-specific fields
+    round = StringField('Round/Stage', validators=[Optional(), Length(max=64)])
+    matchday = IntegerField('Matchday', validators=[Optional(), NumberRange(min=1)])
+
     notes = TextAreaField('Notes', validators=[Optional()])
     submit = SubmitField('Save Game')
 
@@ -18,9 +24,9 @@ class GameResultForm(FlaskForm):
     score_team = IntegerField('Team Score', validators=[DataRequired(), NumberRange(min=0)])
     score_opponent = IntegerField('Opponent Score', validators=[DataRequired(), NumberRange(min=0)])
     status = SelectField('Status',
-                       choices=[('completed', 'Completed'),
-                                ('cancelled', 'Cancelled')],
-                       validators=[DataRequired()])
+                         choices=[('completed', 'Completed'),
+                                  ('cancelled', 'Cancelled')],
+                         validators=[DataRequired()])
     highlights_url = StringField('Highlights URL', validators=[Optional(), URL()])
     notes = TextAreaField('Match Notes', validators=[Optional()])
     submit = SubmitField('Save Result')

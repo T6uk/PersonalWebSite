@@ -19,17 +19,27 @@
                     <dl class="row mb-0">
                         <dt class="col-sm-4">Competition:</dt>
                         <dd class="col-sm-8">
-                            <span class="badge
-                                {% if game.event.event_type == 'league' %}bg-primary
-                                {% elif game.event.event_type == 'tournament' %}bg-success
-                                {% else %}bg-info{% endif %}">
-                                {{ game.event.event_type|capitalize }}
-                            </span>
-                            {{ game.event.name }}
+                            {% if game.competition %}
+                                <span class="badge
+                                    {% if game.competition.competition_type == 'league' %}bg-primary
+                                    {% elif game.competition.competition_type == 'tournament' %}bg-success
+                                    {% else %}bg-info{% endif %}">
+                                    {{ game.competition.competition_type|capitalize }}
+                                </span>
+                                {{ game.competition.name }}
+                            {% else %}
+                                Not specified
+                            {% endif %}
                         </dd>
 
                         <dt class="col-sm-4">Season:</dt>
-                        <dd class="col-sm-8">{{ game.event.season }}</dd>
+                        <dd class="col-sm-8">
+                            {% if game.competition and game.competition.season %}
+                                {{ game.competition.season.name }}
+                            {% else %}
+                                Not specified
+                            {% endif %}
+                        </dd>
 
                         <dt class="col-sm-4">Match:</dt>
                         <dd class="col-sm-8">

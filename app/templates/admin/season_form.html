@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{% if season %}Edit Season{% else %}Add New Season{% endif %}</h1>
+        <a href="{{ url_for('admin.seasons') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Seasons
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Season Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), placeholder="Season Name") }}
+                            {{ form.name.label }}
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">E.g., "2024-2025"</small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-check form-switch mb-3 mt-2">
+                            {{ form.is_current(class="form-check-input") }}
+                            {{ form.is_current.label(class="form-check-label") }}
+                            <small class="d-block text-muted mt-1">If checked, all other seasons will be marked as not current</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.start_date(class="form-control" + (" is-invalid" if form.start_date.errors else ""), type="date", placeholder="Start Date") }}
+                            {{ form.start_date.label }}
+                            {% if form.start_date.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.start_date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.end_date(class="form-control" + (" is-invalid" if form.end_date.errors else ""), type="date", placeholder="End Date") }}
+                            {{ form.end_date.label }}
+                            {% if form.end_date.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.end_date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">Optional for ongoing seasons</small>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end">
+                    <a href="{{ url_for('admin.seasons') }}" class="btn btn-outline-secondary me-2">Cancel</a>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

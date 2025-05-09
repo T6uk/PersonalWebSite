@@ -36,12 +36,17 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'public.league' %}active{% endif %}" href="{{ url_for('public.league') }}">
-                            <i class="bi bi-table me-1"></i>League
+                            <i class="bi bi-trophy me-1"></i>Leagues
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'public.tournaments' %}active{% endif %}" href="{{ url_for('public.tournaments') }}">
                             <i class="bi bi-cup me-1"></i>Tournaments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'public.friendlies' %}active{% endif %}" href="{{ url_for('public.friendlies') }}">
+                            <i class="bi bi-controller me-1"></i>Friendlies
                         </a>
                     </li>
                     <li class="nav-item">
@@ -70,11 +75,20 @@
                             <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">
                                 <i class="bi bi-speedometer2 me-2"></i>Dashboard
                             </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.seasons') }}">
+                                <i class="bi bi-calendar3 me-2"></i>Manage Seasons
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.leagues') }}">
+                                <i class="bi bi-trophy me-2"></i>Manage Leagues
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.tournaments_admin') }}">
+                                <i class="bi bi-cup me-2"></i>Manage Tournaments
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.friendlies_admin') }}">
+                                <i class="bi bi-controller me-2"></i>Manage Friendlies
+                            </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin.players') }}">
                                 <i class="bi bi-person me-2"></i>Manage Players
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin.events') }}">
-                                <i class="bi bi-calendar-event me-2"></i>Manage Events
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin.games') }}">
                                 <i class="bi bi-controller me-2"></i>Manage Games

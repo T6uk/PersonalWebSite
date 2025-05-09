@@ -2,14 +2,19 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from app import db
 from app.models.player import Player
-from app.models.event import Event
 from app.models.game import Game
 from app.models.statistics import PlayerStatistics
 from app.models.trophy import Trophy
+from app.models.season import Season
+from app.models.competition import Competition
+from app.models.league import League
+from app.models.tournament import Tournament
+from app.models.friendly import Friendly
 from app.forms.player import PlayerForm
-from app.forms.event import EventForm
 from app.forms.game import GameForm, GameResultForm, GameStatsForm
 from app.forms.trophy import TrophyForm
+from app.forms.season import SeasonForm
+from app.forms.competition import LeagueForm, TournamentForm, FriendlyForm
 import os
 from datetime import datetime
 from werkzeug.utils import secure_filename
@@ -45,7 +50,7 @@ def save_file(file, folder='uploads'):
 def dashboard():
     # Get counts for statistics
     player_count = Player.query.count()
-    event_count = Event.query.count()
+    competition_count = Competition.query.count()
     upcoming_games_count = Game.query.filter(Game.date > datetime.now(), Game.status == 'upcoming').count()
     trophy_count = Trophy.query.count()
 
@@ -60,7 +65,7 @@ def dashboard():
         'admin/dashboard.html',
         title='Admin Dashboard',
         player_count=player_count,
-        event_count=event_count,
+        competition_count=competition_count,
         upcoming_games_count=upcoming_games_count,
         trophy_count=trophy_count,
         recent_games=recent_games,
@@ -92,14 +97,7 @@ def add_player():
             weight=form.weight.data,
             nationality=form.nationality.data,
             bio=form.bio.data,
-            is_active=form.is_active.data,
-            # Add career statistics
-            career_appearances=form.career_appearances.data,
-            career_goals=form.career_goals.data,
-            career_assists=form.career_assists.data,
-            career_yellow_cards=form.career_yellow_cards.data,
-            career_red_cards=form.career_red_cards.data,
-            career_minutes_played=form.career_minutes_played.data
+            is_active=form.is_active.data
         )
 
         if form.image.data:
@@ -131,13 +129,6 @@ def edit_player(player_id):
         player.nationality = form.nationality.data
         player.bio = form.bio.data
         player.is_active = form.is_active.data
-        # Update career statistics
-        player.career_appearances = form.career_appearances.data
-        player.career_goals = form.career_goals.data
-        player.career_assists = form.career_assists.data
-        player.career_yellow_cards = form.career_yellow_cards.data
-        player.career_red_cards = form.career_red_cards.data
-        player.career_minutes_played = form.career_minutes_played.data
 
         if form.image.data:
             player.image_url = save_file(form.image.data, 'players')
@@ -163,79 +154,329 @@ def delete_player(player_id):
     return redirect(url_for('admin.players'))
 
 
-# Events
-@admin.route('/events')
+# Season Management
+@admin.route('/seasons')
 @login_required
-def events():
-    events = Event.query.order_by(Event.start_date.desc()).all()
-    return render_template('admin/events.html', title='Manage Events', events=events)
+def seasons():
+    seasons = Season.query.order_by(Season.start_date.desc()).all()
+    return render_template('admin/seasons.html', title='Manage Seasons', seasons=seasons)
 
 
-@admin.route('/events/add', methods=['GET', 'POST'])
+@admin.route('/seasons/add', methods=['GET', 'POST'])
 @login_required
-def add_event():
-    form = EventForm()
+def add_season():
+    form = SeasonForm()
 
     if form.validate_on_submit():
-        event = Event(
+        # If this is marked as current season, set all others to not current
+        if form.is_current.data:
+            current_seasons = Season.query.filter_by(is_current=True).all()
+            for season in current_seasons:
+                season.is_current = False
+
+        season = Season(
             name=form.name.data,
-            event_type=form.event_type.data,
-            season=form.season.data,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            is_current=form.is_current.data
+        )
+
+        db.session.add(season)
+        db.session.commit()
+
+        flash(f'Season {season.name} has been added!', 'success')
+        return redirect(url_for('admin.seasons'))
+
+    return render_template('admin/season_form.html', title='Add Season', form=form)
+
+
+@admin.route('/seasons/edit/<int:season_id>', methods=['GET', 'POST'])
+@login_required
+def edit_season(season_id):
+    season = Season.query.get_or_404(season_id)
+    form = SeasonForm(obj=season)
+
+    if form.validate_on_submit():
+        # If this is marked as current season, set all others to not current
+        if form.is_current.data and not season.is_current:
+            current_seasons = Season.query.filter_by(is_current=True).all()
+            for current_season in current_seasons:
+                current_season.is_current = False
+
+        season.name = form.name.data
+        season.start_date = form.start_date.data
+        season.end_date = form.end_date.data
+        season.is_current = form.is_current.data
+
+        db.session.commit()
+
+        flash(f'Season {season.name} has been updated!', 'success')
+        return redirect(url_for('admin.seasons'))
+
+    return render_template('admin/season_form.html', title='Edit Season', form=form, season=season)
+
+
+@admin.route('/seasons/delete/<int:season_id>', methods=['POST'])
+@login_required
+def delete_season(season_id):
+    season = Season.query.get_or_404(season_id)
+    name = season.name
+
+    db.session.delete(season)
+    db.session.commit()
+
+    flash(f'Season {name} has been deleted!', 'success')
+    return redirect(url_for('admin.seasons'))
+
+
+# League Management
+@admin.route('/leagues')
+@login_required
+def leagues():
+    leagues = League.query.order_by(League.start_date.desc()).all()
+    return render_template('admin/leagues.html', title='Manage Leagues', leagues=leagues)
+
+
+@admin.route('/leagues/add', methods=['GET', 'POST'])
+@login_required
+def add_league():
+    form = LeagueForm()
+    # Populate season choices
+    form.season_id.choices = [(s.id, s.name) for s in Season.query.order_by(Season.start_date.desc()).all()]
+
+    if form.validate_on_submit():
+        league = League(
+            name=form.name.data,
+            season_id=form.season_id.data,
+            competition_type='league',  # Set explicitly
             start_date=form.start_date.data,
             end_date=form.end_date.data,
             location=form.location.data,
-            description=form.description.data
+            description=form.description.data,
+            format=form.format.data,
+            num_teams=form.num_teams.data,
+            points_for_win=form.points_for_win.data,
+            points_for_draw=form.points_for_draw.data
         )
 
         if form.image.data:
-            event.image_url = save_file(form.image.data, 'events')
+            league.image_url = save_file(form.image.data, 'leagues')
 
-        db.session.add(event)
+        db.session.add(league)
         db.session.commit()
 
-        flash(f'Event {event.name} has been added!', 'success')
-        return redirect(url_for('admin.events'))
+        flash(f'League {league.name} has been added!', 'success')
+        return redirect(url_for('admin.leagues'))
 
-    return render_template('admin/event_form.html', title='Add Event', form=form)
+    return render_template('admin/league_form.html', title='Add League', form=form)
 
 
-@admin.route('/events/edit/<int:event_id>', methods=['GET', 'POST'])
+@admin.route('/leagues/edit/<int:league_id>', methods=['GET', 'POST'])
 @login_required
-def edit_event(event_id):
-    event = Event.query.get_or_404(event_id)
-    form = EventForm(obj=event)
+def edit_league(league_id):
+    league = League.query.get_or_404(league_id)
+    form = LeagueForm(obj=league)
+    # Populate season choices
+    form.season_id.choices = [(s.id, s.name) for s in Season.query.order_by(Season.start_date.desc()).all()]
 
     if form.validate_on_submit():
-        event.name = form.name.data
-        event.event_type = form.event_type.data
-        event.season = form.season.data
-        event.start_date = form.start_date.data
-        event.end_date = form.end_date.data
-        event.location = form.location.data
-        event.description = form.description.data
+        league.name = form.name.data
+        league.season_id = form.season_id.data
+        league.start_date = form.start_date.data
+        league.end_date = form.end_date.data
+        league.location = form.location.data
+        league.description = form.description.data
+        league.format = form.format.data
+        league.num_teams = form.num_teams.data
+        league.points_for_win = form.points_for_win.data
+        league.points_for_draw = form.points_for_draw.data
 
         if form.image.data:
-            event.image_url = save_file(form.image.data, 'events')
+            league.image_url = save_file(form.image.data, 'leagues')
 
         db.session.commit()
 
-        flash(f'Event {event.name} has been updated!', 'success')
-        return redirect(url_for('admin.events'))
+        flash(f'League {league.name} has been updated!', 'success')
+        return redirect(url_for('admin.leagues'))
 
-    return render_template('admin/event_form.html', title='Edit Event', form=form, event=event)
+    return render_template('admin/league_form.html', title='Edit League', form=form, league=league)
 
 
-@admin.route('/events/delete/<int:event_id>', methods=['POST'])
+@admin.route('/leagues/delete/<int:league_id>', methods=['POST'])
 @login_required
-def delete_event(event_id):
-    event = Event.query.get_or_404(event_id)
-    name = event.name
+def delete_league(league_id):
+    league = League.query.get_or_404(league_id)
+    name = league.name
 
-    db.session.delete(event)
+    db.session.delete(league)
     db.session.commit()
 
-    flash(f'Event {name} has been deleted!', 'success')
-    return redirect(url_for('admin.events'))
+    flash(f'League {name} has been deleted!', 'success')
+    return redirect(url_for('admin.leagues'))
+
+
+# Tournament Management
+@admin.route('/tournaments_admin')
+@login_required
+def tournaments_admin():
+    tournaments = Tournament.query.order_by(Tournament.start_date.desc()).all()
+    return render_template('admin/tournaments.html', title='Manage Tournaments', tournaments=tournaments)
+
+
+@admin.route('/tournaments/add', methods=['GET', 'POST'])
+@login_required
+def add_tournament():
+    form = TournamentForm()
+    # Populate season choices
+    form.season_id.choices = [(s.id, s.name) for s in Season.query.order_by(Season.start_date.desc()).all()]
+
+    if form.validate_on_submit():
+        tournament = Tournament(
+            name=form.name.data,
+            season_id=form.season_id.data,
+            competition_type='tournament',  # Set explicitly
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            location=form.location.data,
+            description=form.description.data,
+            format=form.format.data,
+            num_teams=form.num_teams.data,
+            current_round=form.current_round.data
+        )
+
+        if form.image.data:
+            tournament.image_url = save_file(form.image.data, 'tournaments')
+
+        db.session.add(tournament)
+        db.session.commit()
+
+        flash(f'Tournament {tournament.name} has been added!', 'success')
+        return redirect(url_for('admin.tournaments_admin'))
+
+    return render_template('admin/tournament_form.html', title='Add Tournament', form=form)
+
+
+@admin.route('/tournaments/edit/<int:tournament_id>', methods=['GET', 'POST'])
+@login_required
+def edit_tournament(tournament_id):
+    tournament = Tournament.query.get_or_404(tournament_id)
+    form = TournamentForm(obj=tournament)
+    # Populate season choices
+    form.season_id.choices = [(s.id, s.name) for s in Season.query.order_by(Season.start_date.desc()).all()]
+
+    if form.validate_on_submit():
+        tournament.name = form.name.data
+        tournament.season_id = form.season_id.data
+        tournament.start_date = form.start_date.data
+        tournament.end_date = form.end_date.data
+        tournament.location = form.location.data
+        tournament.description = form.description.data
+        tournament.format = form.format.data
+        tournament.num_teams = form.num_teams.data
+        tournament.current_round = form.current_round.data
+
+        if form.image.data:
+            tournament.image_url = save_file(form.image.data, 'tournaments')
+
+        db.session.commit()
+
+        flash(f'Tournament {tournament.name} has been updated!', 'success')
+        return redirect(url_for('admin.tournaments_admin'))
+
+    return render_template('admin/tournament_form.html', title='Edit Tournament', form=form, tournament=tournament)
+
+
+@admin.route('/tournaments/delete/<int:tournament_id>', methods=['POST'])
+@login_required
+def delete_tournament(tournament_id):
+    tournament = Tournament.query.get_or_404(tournament_id)
+    name = tournament.name
+
+    db.session.delete(tournament)
+    db.session.commit()
+
+    flash(f'Tournament {name} has been deleted!', 'success')
+    return redirect(url_for('admin.tournaments_admin'))
+
+
+# Friendly Management
+@admin.route('/friendlies_admin')
+@login_required
+def friendlies_admin():
+    friendlies = Friendly.query.order_by(Friendly.start_date.desc()).all()
+    return render_template('admin/friendlies.html', title='Manage Friendlies', friendlies=friendlies)
+
+
+@admin.route('/friendlies/add', methods=['GET', 'POST'])
+@login_required
+def add_friendly():
+    form = FriendlyForm()
+    # Populate season choices
+    form.season_id.choices = [(s.id, s.name) for s in Season.query.order_by(Season.start_date.desc()).all()]
+
+    if form.validate_on_submit():
+        friendly = Friendly(
+            name=form.name.data,
+            season_id=form.season_id.data,
+            competition_type='friendly',  # Set explicitly
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            location=form.location.data,
+            description=form.description.data,
+            purpose=form.purpose.data
+        )
+
+        if form.image.data:
+            friendly.image_url = save_file(form.image.data, 'friendlies')
+
+        db.session.add(friendly)
+        db.session.commit()
+
+        flash(f'Friendly {friendly.name} has been added!', 'success')
+        return redirect(url_for('admin.friendlies_admin'))
+
+    return render_template('admin/friendly_form.html', title='Add Friendly', form=form)
+
+
+@admin.route('/friendlies/edit/<int:friendly_id>', methods=['GET', 'POST'])
+@login_required
+def edit_friendly(friendly_id):
+    friendly = Friendly.query.get_or_404(friendly_id)
+    form = FriendlyForm(obj=friendly)
+    # Populate season choices
+    form.season_id.choices = [(s.id, s.name) for s in Season.query.order_by(Season.start_date.desc()).all()]
+
+    if form.validate_on_submit():
+        friendly.name = form.name.data
+        friendly.season_id = form.season_id.data
+        friendly.start_date = form.start_date.data
+        friendly.end_date = form.end_date.data
+        friendly.location = form.location.data
+        friendly.description = form.description.data
+        friendly.purpose = form.purpose.data
+
+        if form.image.data:
+            friendly.image_url = save_file(form.image.data, 'friendlies')
+
+        db.session.commit()
+
+        flash(f'Friendly {friendly.name} has been updated!', 'success')
+        return redirect(url_for('admin.friendlies_admin'))
+
+    return render_template('admin/friendly_form.html', title='Edit Friendly', form=form, friendly=friendly)
+
+
+@admin.route('/friendlies/delete/<int:friendly_id>', methods=['POST'])
+@login_required
+def delete_friendly(friendly_id):
+    friendly = Friendly.query.get_or_404(friendly_id)
+    name = friendly.name
+
+    db.session.delete(friendly)
+    db.session.commit()
+
+    flash(f'Friendly {name} has been deleted!', 'success')
+    return redirect(url_for('admin.friendlies_admin'))
 
 
 # Games
@@ -250,17 +491,19 @@ def games():
 @login_required
 def add_game():
     form = GameForm()
-    # Populate event choices
-    form.event_id.choices = [(e.id, f"{e.name} ({e.season})") for e in
-                             Event.query.order_by(Event.start_date.desc()).all()]
+    # Populate competition choices
+    form.competition_id.choices = [(c.id, f"{c.name} ({c.season.name}) - {c.competition_type.capitalize()}")
+                                  for c in Competition.query.join(Season).order_by(Season.start_date.desc()).all()]
 
     if form.validate_on_submit():
         game = Game(
-            event_id=form.event_id.data,
+            competition_id=form.competition_id.data,
             opponent=form.opponent.data,
             date=form.date.data,
             location=form.location.data,
             is_home_game=form.is_home_game.data,
+            round=form.round.data,
+            matchday=form.matchday.data,
             notes=form.notes.data,
             status='upcoming'
         )
@@ -279,16 +522,18 @@ def add_game():
 def edit_game(game_id):
     game = Game.query.get_or_404(game_id)
     form = GameForm(obj=game)
-    # Populate event choices
-    form.event_id.choices = [(e.id, f"{e.name} ({e.season})") for e in
-                             Event.query.order_by(Event.start_date.desc()).all()]
+    # Populate competition choices
+    form.competition_id.choices = [(c.id, f"{c.name} ({c.season.name}) - {c.competition_type.capitalize()}")
+                                  for c in Competition.query.join(Season).order_by(Season.start_date.desc()).all()]
 
     if form.validate_on_submit():
-        game.event_id = form.event_id.data
+        game.competition_id = form.competition_id.data
         game.opponent = form.opponent.data
         game.date = form.date.data
         game.location = form.location.data
         game.is_home_game = form.is_home_game.data
+        game.round = form.round.data
+        game.matchday = form.matchday.data
         game.notes = form.notes.data
 
         db.session.commit()

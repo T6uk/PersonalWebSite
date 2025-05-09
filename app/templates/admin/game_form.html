@@ -21,11 +21,11 @@
                     <!-- Game Information -->
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
-                            {{ form.event_id(class="form-control" + (" is-invalid" if form.event_id.errors else ""), placeholder="Event") }}
-                            {{ form.event_id.label }}
-                            {% if form.event_id.errors %}
+                            {{ form.competition_id(class="form-control" + (" is-invalid" if form.competition_id.errors else ""), placeholder="Competition") }}
+                            {{ form.competition_id.label }}
+                            {% if form.competition_id.errors %}
                                 <div class="invalid-feedback">
-                                    {% for error in form.event_id.errors %}
+                                    {% for error in form.competition_id.errors %}
                                         {{ error }}
                                     {% endfor %}
                                 </div>
@@ -75,12 +75,44 @@
                         </div>
                     </div>
 
-                    <div class="col-12">
+                    <div class="col-md-6">
                         <div class="form-check form-switch mb-3">
                             {{ form.is_home_game(class="form-check-input") }}
                             {{ form.is_home_game.label(class="form-check-label") }}
                         </div>
                     </div>
+
+                    {% if form.round is defined %}
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.round(class="form-control" + (" is-invalid" if form.round.errors else ""), placeholder="Round/Stage") }}
+                            {{ form.round.label }}
+                            {% if form.round.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.round.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.matchday is defined %}
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.matchday(class="form-control" + (" is-invalid" if form.matchday.errors else ""), placeholder="Matchday") }}
+                            {{ form.matchday.label }}
+                            {% if form.matchday.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.matchday.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
 
                     <div class="col-12">
                         <div class="mb-3">

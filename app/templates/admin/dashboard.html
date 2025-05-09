@@ -27,12 +27,12 @@
             <div class="card h-100 bg-success text-white">
                 <div class="card-body d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title">Events</h5>
+                        <h5 class="card-title">Competitions</h5>
                         <i class="bi bi-calendar-event fs-1 opacity-50"></i>
                     </div>
-                    <h2 class="mt-2 mb-0">{{ event_count }}</h2>
+                    <h2 class="mt-2 mb-0">{{ competition_count }}</h2>
                     <p class="mt-auto mb-0">
-                        <a href="{{ url_for('admin.events') }}" class="text-white text-decoration-none">Manage Events <i class="bi bi-arrow-right"></i></a>
+                        <a href="{{ url_for('admin.leagues') }}" class="text-white text-decoration-none">Manage Leagues <i class="bi bi-arrow-right"></i></a>
                     </p>
                 </div>
             </div>
@@ -82,8 +82,8 @@
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ url_for('admin.add_event') }}" class="btn btn-outline-success w-100 d-flex align-items-center justify-content-center gap-2 py-2">
-                                <i class="bi bi-calendar-plus"></i> Create New Event
+                            <a href="{{ url_for('admin.add_league') }}" class="btn btn-outline-success w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trophy"></i> Create New League
                             </a>
                         </div>
                         <div class="col-md-3">
@@ -126,7 +126,12 @@
                                                 {% endif %}
                                             </h6>
                                             <small class="text-muted">
-                                                {{ game.date.strftime('%d %b %Y') }} - {{ game.event.name }}
+                                                {{ game.date.strftime('%d %b %Y') }} -
+                                                {% if game.competition %}
+                                                    {{ game.competition.name }}
+                                                {% else %}
+                                                    Competition not set
+                                                {% endif %}
                                             </small>
                                         </div>
                                         <div class="text-center">
@@ -173,7 +178,12 @@
                                                 {% endif %}
                                             </h6>
                                             <small class="text-muted">
-                                                {{ game.date.strftime('%d %b %Y %H:%M') }} - {{ game.event.name }}
+                                                {{ game.date.strftime('%d %b %Y %H:%M') }} -
+                                                {% if game.competition %}
+                                                    {{ game.competition.name }}
+                                                {% else %}
+                                                    Competition not set
+                                                {% endif %}
                                             </small>
                                         </div>
                                         <div>
